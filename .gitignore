@@ -1,0 +1,13 @@
+## General
+
+## Linux
+.*
+!.gitignore
+*~
+
+## Python
+*.py[cod]
+
+
+## App specific
+config.py
