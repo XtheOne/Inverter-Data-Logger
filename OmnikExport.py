@@ -123,6 +123,7 @@ if pvout_enabled and (now.minute % 5) == 0:
         't': now.strftime('%H:%M'),
         'v1': msg.getEToday() * 1000,
         'v2': msg.getPAC(1),
+        'v5': msg.getTemp(),
         'v6': msg.getVPV(1)
         }
     
