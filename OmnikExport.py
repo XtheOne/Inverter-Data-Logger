@@ -33,6 +33,7 @@ config.read(mydir + '/config.cfg')
 ip              = config.get('inverter','ip')
 port            = config.get('inverter','port')
 inverter_string = HexByteConversion.HexToByte(config.get('inverter','inverter_string'))
+use_temp        = config.getboolean('inverter','use_temperature')
 
 mysql_enabled   = config.getboolean('mysql', 'mysql_enabled')
 mysql_host      = config.get('mysql','mysql_host')
@@ -64,6 +65,7 @@ for res in socket.getaddrinfo(ip, port, socket.AF_INET , socket.SOCK_STREAM):
         if log_enabled:
             logger.info('connecting to %s port %s' % server_address)
         s = socket.socket(af, socktype, proto)
+        s.settimeout(10)
     except socket.error as msg:
         s = None
         continue
@@ -116,17 +118,28 @@ if pvout_enabled and (now.minute % 5) == 0:
         logger.info('Uploading to PVoutput')
     url = "http://pvoutput.org/service/r2/addstatus.jsp"
     
-    get_data = {
-        'key': pvout_apikey, 
-        'sid': pvout_sysid, 
-        'd': now.strftime('%Y%m%d'),
-        't': now.strftime('%H:%M'),
-        'v1': msg.getEToday() * 1000,
-        'v2': msg.getPAC(1),
-        'v5': msg.getTemp(),
-        'v6': msg.getVPV(1)
+    if use_temp:
+        get_data = {
+            'key': pvout_apikey, 
+            'sid': pvout_sysid, 
+            'd': now.strftime('%Y%m%d'),
+            't': now.strftime('%H:%M'),
+            'v1': msg.getEToday() * 1000,
+            'v2': msg.getPAC(1),
+            'v5': msg.getTemp(),
+            'v6': msg.getVPV(1)
         }
-    
+    else:
+        get_data = {
+            'key': pvout_apikey, 
+            'sid': pvout_sysid, 
+            'd': now.strftime('%Y%m%d'),
+            't': now.strftime('%H:%M'),
+            'v1': msg.getEToday() * 1000,
+            'v2': msg.getPAC(1),
+            'v6': msg.getVPV(1)
+        }
+
     get_data_encoded = urllib.urlencode(get_data)                       # UrlEncode the parameters
     
     request_object = urllib2.Request(url + '?' + get_data_encoded)      # Create request object
