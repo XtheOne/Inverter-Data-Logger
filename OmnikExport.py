@@ -1,29 +1,19 @@
 #!/usr/bin/python
 
-from InverterMsg import InverterMsg # Import the Msg handler
+import InverterMsg      # Import the Msg handler
 
 import socket               # Needed for talking to inverter
 import datetime             # Used for timestamp
 import sys
 import logging
 import ConfigParser, os
-from os import path
-
-# For database output
-import MySQLdb as mdb       
 
 # For PVoutput 
-import urllib
-import urllib2
-
+import urllib, urllib2
 
 import HexByteConversion
 
-# Unsafe but very simple config manager
-#from config_default import *
-
-#if path.exists('config.py'):
-#    from config import *
+# Load the setting
 mydir = os.path.dirname(os.path.abspath(__file__))
 
 config = ConfigParser.RawConfigParser()
@@ -84,7 +74,7 @@ s.sendall(message)
 data = s.recv(1024)
 s.close()
 
-msg = InverterMsg(data)  # This is where the magic happens ;)
+msg = InverterMsg.InverterMsg(data)  # This is where the magic happens ;)
 now = datetime.datetime.now()
 
 if log_enabled:
@@ -92,6 +82,9 @@ if log_enabled:
 
 
 if mysql_enabled:
+    # For database output
+    import MySQLdb as mdb   
+    
     if log_enabled:
         logger.info('Uploading to database')
     con = mdb.connect(mysql_host, mysql_user, mysql_pass, mysql_db);
