@@ -11,8 +11,6 @@ import ConfigParser, os
 # For PVoutput 
 import urllib, urllib2
 
-import HexByteConversion
-
 # Load the setting
 mydir = os.path.dirname(os.path.abspath(__file__))
 
@@ -22,8 +20,8 @@ config.read([mydir + '/config-default.cfg', mydir + '/config.cfg'])
 # Receive data with a socket
 ip              = config.get('inverter','ip')
 port            = config.get('inverter','port')
-inverter_string = HexByteConversion.HexToByte(config.get('inverter','inverter_string'))
 use_temp        = config.getboolean('inverter','use_temperature')
+wifi_serial     = config.getint('inverter', 'wifi_sn')
 
 mysql_enabled   = config.getboolean('mysql', 'mysql_enabled')
 mysql_host      = config.get('mysql','mysql_host')
@@ -40,7 +38,6 @@ log_filename    = mydir + '/' + config.get('log','log_filename')
 
 
 server_address = ((ip, port))
-message = inverter_string
 
 logger = logging.getLogger('OmnikLogger')
 hdlr = logging.FileHandler(log_filename)
@@ -66,11 +63,13 @@ for res in socket.getaddrinfo(ip, port, socket.AF_INET , socket.SOCK_STREAM):
         s = None
         continue
     break
+    
 if s is None:
     if log_enabled:
         logger.error('could not open socket')
     sys.exit(1)
-s.sendall(message)
+    
+s.sendall(InverterMsg.generate_string(wifi_serial))
 data = s.recv(1024)
 s.close()
 
