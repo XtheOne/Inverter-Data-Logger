@@ -10,4 +10,5 @@
 
 
 ## App specific
-config.py
+config.cfg
+omnik-export.log

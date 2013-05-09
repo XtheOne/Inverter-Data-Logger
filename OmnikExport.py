@@ -17,7 +17,7 @@ import HexByteConversion
 mydir = os.path.dirname(os.path.abspath(__file__))
 
 config = ConfigParser.RawConfigParser()
-config.read(mydir + '/config.cfg')
+config.read([mydir + '/config-default.cfg', mydir + '/config.cfg'])
 
 # Receive data with a socket
 ip              = config.get('inverter','ip')
