@@ -1,42 +1,34 @@
 #!/usr/bin/python
 
-from InverterMsg import InverterMsg # Import the Msg handler
-import sys
+import InverterMsg # Import the Msg handler
+import sys, os
 import socket               # Needed for talking to inverter
-import datetime             # Used for timestamp
+import ConfigParser
 
+# Load the setting
+mydir = os.path.dirname(os.path.abspath(__file__))
 
-################
-### Settings ###
-################
+config = ConfigParser.RawConfigParser()
+config.read([mydir + '/config-default.cfg', mydir + '/config.cfg'])
 
-# Inverter
-ip = '192.168.1.15'
-port = 8899
+# Receive data with a socket
+ip              = config.get('inverter','ip')
+port            = config.get('inverter','port')
+wifi_serial     = config.getint('inverter', 'wifi_sn')
 
-#######################
-### End of Settings ###
-#######################
+log_enabled     = config.getboolean('log','log_enabled')
+log_filename    = mydir + '/' + config.get('log','log_filename')
 
-#s = socket.socket()                                                     # Create a socket object
-#s.connect((ip, port))
-#s.sendall('\x68\x02\x40\x30\xa6\x68\xe6\x23\xa6\x68\xe6\x23\x01\x00\xa1\x16')
-#data = s.recv(128)
-#s.close                                                                 # Close the socket when done
-
-# Create a TCP/IP socket
-#sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 # Connect the socket to the port where the server is listening
 server_address = ((ip, port))
-message =      '\x68\x02\x40\x30\xcb\x64\xec\x23\xcb\x64\xec\x23\x01\x00\xef\x16'
-
 
 for res in socket.getaddrinfo(ip, port, socket.AF_INET , socket.SOCK_STREAM):
     af, socktype, proto, canonname, sa = res
     try:
         print >>sys.stderr, 'connecting to %s port %s' % server_address
         s = socket.socket(af, socktype, proto)
+        s.settimeout(10)
     except socket.error as msg:
         s = None
         continue
@@ -47,22 +39,19 @@ for res in socket.getaddrinfo(ip, port, socket.AF_INET , socket.SOCK_STREAM):
         s = None
         continue
     break
+
 if s is None:
     print 'could not open socket'
     sys.exit(1)
-s.sendall(message)
-data = s.recv(1024)
+    
+s.sendall(InverterMsg.generate_string(wifi_serial))
+data = ''
+while 1:
+    data += s.recv(1024)
+    if len(data) >= 198: break
 s.close()
 
-#print 'Received', repr(data)
-
-
-
-#sock.sendall('\x68\x02\x40\x30\xa6\x68\xe6\x23\xa6\x68\xe6\x23\x01\x00\xa1\x16')
-#data = sock.recv(128)
-#sock.close
-
-msg = InverterMsg(data)  # This is where the magic happens ;)
+msg = InverterMsg.InverterMsg(data)  # This is where the magic happens ;)
 print "ID: {0}".format(msg.getID())
 
 print "E Today: {0:>5}   Total: {1:<5}".format(msg.getEToday(), msg.getETotal())
