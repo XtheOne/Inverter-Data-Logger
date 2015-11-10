@@ -8,6 +8,8 @@ import sys
 import logging
 import ConfigParser, os
 
+from PluginLoader import Plugin
+
 # For PVoutput 
 import urllib, urllib2
 
@@ -46,6 +48,18 @@ hdlr.setFormatter(formatter)
 logger.addHandler(hdlr) 
 logger.setLevel(logging.DEBUG)
 
+# Load output plugins
+# Prepare path for plugin loading
+sys.path.append('outputs')
+
+Plugin.config = config
+Plugin.logger = logger
+for plugin_name in config.get('general', 'enabled_plugins').split(','):
+    plugin_name = plugin_name.strip()
+    logger.debug('Importing output plugin ' + plugin_name)
+    __import__(plugin_name)
+
+
 for res in socket.getaddrinfo(ip, port, socket.AF_INET , socket.SOCK_STREAM):
     af, socktype, proto, canonname, sa = res
     try:
@@ -79,6 +93,9 @@ now = datetime.datetime.now()
 if log_enabled:
     logger.info("ID: {0}".format(msg.getID())) 
 
+for plugin in Plugin.plugins:
+    logger.debug('Run plugin' + plugin.__class__.__name__)
+    plugin.process_message(msg)
 
 if mysql_enabled:
     # For database output
