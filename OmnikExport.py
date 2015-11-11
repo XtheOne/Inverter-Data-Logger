@@ -25,12 +25,6 @@ port            = config.get('inverter','port')
 use_temp        = config.getboolean('inverter','use_temperature')
 wifi_serial     = config.getint('inverter', 'wifi_sn')
 
-mysql_enabled   = config.getboolean('mysql', 'mysql_enabled')
-mysql_host      = config.get('mysql','mysql_host')
-mysql_user      = config.get('mysql','mysql_user')
-mysql_pass      = config.get('mysql','mysql_pass')
-mysql_db        = config.get('mysql','mysql_db')
-
 pvout_enabled   = config.getboolean('pvout','pvout_enabled')
 pvout_apikey    = config.get('pvout','pvout_apikey')
 pvout_sysid     = config.get('pvout','pvout_sysid')
@@ -97,30 +91,6 @@ for plugin in Plugin.plugins:
     logger.debug('Run plugin' + plugin.__class__.__name__)
     plugin.process_message(msg)
 
-if mysql_enabled:
-    # For database output
-    import MySQLdb as mdb   
-    
-    if log_enabled:
-        logger.info('Uploading to database')
-    con = mdb.connect(mysql_host, mysql_user, mysql_pass, mysql_db);
-    
-    with con:
-        cur = con.cursor()
-        cur.execute("""INSERT INTO minutes 
-        (InvID, timestamp, ETotal, EToday, Temp, HTotal, VPV1, VPV2, VPV3,
-         IPV1, IPV2, IPV3, VAC1, VAC2, VAC3, IAC1, IAC2, IAC3, FAC1, FAC2, 
-         FAC3, PAC1, PAC2, PAC3) 
-        VALUES 
-        (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
-         %s, %s, %s, %s, %s, %s, %s);""", 
-         (msg.getID(), now, msg.getETotal(), 
-          msg.getEToday(), msg.getTemp(), msg.getHTotal(), msg.getVPV(1), 
-          msg.getVPV(2), msg.getVPV(3), msg.getIPV(1), msg.getIPV(2), 
-          msg.getIPV(3), msg.getVAC(1), msg.getVAC(2), msg.getVAC(3), 
-          msg.getIAC(1), msg.getIAC(2), msg.getIAC(3), msg.getFAC(1), 
-          msg.getFAC(2), msg.getFAC(3), msg.getPAC(1), msg.getPAC(2), 
-          msg.getPAC(3)) );
 
 if pvout_enabled and (now.minute % 5) == 0:
     if log_enabled:
