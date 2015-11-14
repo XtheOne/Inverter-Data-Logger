@@ -1,9 +1,5 @@
 #!/usr/bin/python
-
-import InverterMsg      # Import the Msg handler
-
 import socket               # Needed for talking to inverter
-import datetime             # Used for timestamp
 import sys
 import logging
 import logging.config
@@ -11,11 +7,7 @@ import ConfigParser
 import os
 
 from PluginLoader import Plugin
-
-# For PVoutput
-import urllib
-import urllib2
-
+import InverterMsg      # Import the Msg handler
 
 class OmnikExport(object):
 
@@ -26,14 +18,6 @@ class OmnikExport(object):
 
         config = ConfigParser.RawConfigParser()
         config.read([mydir + '/config-default.cfg', mydir + '/config.cfg'])
-
-        # Receive data with a socket
-        ip = config.get('inverter', 'ip')
-        port = config.get('inverter', 'port')
-        use_temp = config.getboolean('inverter', 'use_temperature')
-        wifi_serial = config.getint('inverter', 'wifi_sn')
-
-        server_address = (ip, port)
 
         # Build logger
         log_levels = dict(debug=10, info=20, warning=30, error=40, critical=50)
@@ -68,34 +52,28 @@ class OmnikExport(object):
             logger.debug('Importing output plugin ' + plugin_name)
             __import__(plugin_name)
 
+        # Connect to inverter
+        ip = config.get('inverter', 'ip')
+        port = config.get('inverter', 'port')
 
         for res in socket.getaddrinfo(ip, port, socket.AF_INET, socket.SOCK_STREAM):
             af, socktype, proto, canonname, sa = res
             try:
-                logger.info('connecting to %s port %s' % server_address)
+                logger.info('connecting to {0} port {1}'.format(ip, port))
                 s = socket.socket(af, socktype, proto)
                 s.settimeout(10)
-            except socket.error as msg:
-                s = None
-                continue
-            try:
                 s.connect(sa)
             except socket.error as msg:
-                s.close()
-                s = None
-                continue
-            break
+                logger.error('Could not open socket')
+                logger.error(msg)
+                sys.exit(1)
 
-        if s is None:
-            logger.error('could not open socket')
-            sys.exit(1)
-
+        wifi_serial = config.getint('inverter', 'wifi_sn')
         s.sendall(InverterMsg.generate_string(wifi_serial))
         data = s.recv(1024)
         s.close()
 
         msg = InverterMsg.InverterMsg(data)
-        now = datetime.datetime.now()
 
         logger.info("ID: {0}".format(msg.getID()))
 
