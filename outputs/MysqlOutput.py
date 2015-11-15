@@ -6,6 +6,11 @@ class MysqlOutput(PluginLoader.Plugin):
     """Stores the data from the Omnik inverter into a mysql database"""
 
     def process_message(self, msg):
+        """Store the information from the inverter in a mysql database.
+
+        Args:
+            msg (InverterMsg.InverterMsg): Message to process
+        """
         import MySQLdb
 
         self.logger.debug('Connect to database')
@@ -24,15 +29,15 @@ class MysqlOutput(PluginLoader.Plugin):
             VALUES
             (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
              %s, %s, %s, %s, %s, %s, %s);""",
-                        (msg.getID(), datetime.datetime.now(), msg.getETotal(),
-                         msg.getEToday(), msg.getTemp(), msg.getHTotal(),
-                         msg.getVPV(1),
-                         msg.getVPV(2), msg.getVPV(3), msg.getIPV(1),
-                         msg.getIPV(2),
-                         msg.getIPV(3), msg.getVAC(1), msg.getVAC(2),
-                         msg.getVAC(3),
-                         msg.getIAC(1), msg.getIAC(2), msg.getIAC(3),
-                         msg.getFAC(1),
-                         msg.getFAC(2), msg.getFAC(3), msg.getPAC(1),
-                         msg.getPAC(2),
-                         msg.getPAC(3)))
+                        (msg.id, datetime.datetime.now(), msg.e_total,
+                         msg.e_today, msg.temperature, msg.h_total,
+                         msg.v_pv(1),
+                         msg.v_pv(2), msg.v_pv(3), msg.i_pv(1),
+                         msg.i_pv(2),
+                         msg.i_pv(3), msg.v_ac(1), msg.v_ac(2),
+                         msg.v_ac(3),
+                         msg.i_ac(1), msg.i_ac(2), msg.i_ac(3),
+                         msg.f_ac(1),
+                         msg.f_ac(2), msg.f_ac(3), msg.p_ac(1),
+                         msg.p_ac(2),
+                         msg.p_ac(3)))

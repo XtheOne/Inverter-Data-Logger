@@ -5,11 +5,18 @@ import urllib2
 
 
 class PVoutputOutput(PluginLoader.Plugin):
-    """Sends the data from the Omnik invertor to PVoutput.org"""
+    """Sends the data from the Omnik inverter to PVoutput.org"""
 
     def process_message(self, msg):
+        """Send the information from the inverter to PVoutput.org.
+
+        Args:
+            msg (InverterMsg.InverterMsg): Message to process
+
+        """
         now = datetime.datetime.now()
-        if (now.minute % 5) == 0:
+
+        if (now.minute % 5) == 0:  # Only run at every 4 minute interval
             self.logger.info('Uploading to PVoutput')
 
             url = "http://pvoutput.org/service/r2/addstatus.jsp"
@@ -20,10 +27,10 @@ class PVoutputOutput(PluginLoader.Plugin):
                     'sid': self.config.get('pvout', 'sysid'),
                     'd': now.strftime('%Y%m%d'),
                     't': now.strftime('%H:%M'),
-                    'v1': msg.getEToday() * 1000,
-                    'v2': msg.getPAC(1),
-                    'v5': msg.getTemp(),
-                    'v6': msg.getVPV(1)
+                    'v1': msg.e_today * 1000,
+                    'v2': msg.p_ac(1),
+                    'v5': msg.temperature,
+                    'v6': msg.v_pv(1)
                 }
             else:
                 get_data = {
@@ -31,14 +38,14 @@ class PVoutputOutput(PluginLoader.Plugin):
                     'sid': self.config.get('pvout', 'sysid'),
                     'd': now.strftime('%Y%m%d'),
                     't': now.strftime('%H:%M'),
-                    'v1': msg.getEToday() * 1000,
-                    'v2': msg.getPAC(1),
-                    'v6': msg.getVPV(1)
+                    'v1': msg.e_today * 1000,
+                    'v2': msg.p_ac(1),
+                    'v6': msg.v_pv(1)
                 }
 
-            get_data_encoded = urllib.urlencode(get_data)  # UrlEncode the parameters
+            get_data_encoded = urllib.urlencode(get_data)
 
-            request_object = urllib2.Request(url + '?' + get_data_encoded)  # Create request object
-            response = urllib2.urlopen(request_object)  # Make the request and store the response
+            request_object = urllib2.Request(url + '?' + get_data_encoded)
+            response = urllib2.urlopen(request_object)
 
             self.logger.info(response.read())  # Show the response
