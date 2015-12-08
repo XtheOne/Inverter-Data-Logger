@@ -15,6 +15,8 @@ possible to get the data directly from the inverter. So sniffing the data send
 to the omnik portal is required, see OmnikMQTT by wouterbaake
 (https://github.com/wouterbaake/OmnikMQTT) .
 
+Owners of a Wifi kit starting with s/n 402xxxxxxx should checkout
+Omnikol-PV-Logger by t3kpunk (https://github.com/t3kpunk/Omniksol-PV-Logger).
 
 ## Installation and Setup
 
