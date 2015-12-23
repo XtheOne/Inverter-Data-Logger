@@ -21,17 +21,75 @@ class OmnikExport(object):
 
     """
 
-    @staticmethod
-    def run():
+    config = None
+    logger = None
+
+    def __init__(self, config_file):
+        # Load the setting
+        config_files = [self.__expand_path('config-default.cfg'),
+                        self.__expand_path(config_file)]
+
+        self.config = ConfigParser.RawConfigParser()
+        self.config.read(config_files)
+
+    def run(self):
         """Get information from inverter and store is configured outputs."""
 
-        # Load the setting
-        mydir = os.path.dirname(os.path.abspath(__file__))
+        self.build_logger(self.config)
 
-        config = ConfigParser.RawConfigParser()
-        config.read([mydir + '/config-default.cfg', mydir + '/config.cfg'])
+        # Load output plugins
+        # Prepare path for plugin loading
+        sys.path.append('outputs')
 
+        Plugin.config = self.config
+        Plugin.logger = self.logger
+
+        enabled_plugins = self.config.get('general', 'enabled_plugins')\
+                                     .split(',')
+        for plugin_name in enabled_plugins:
+            plugin_name = plugin_name.strip()
+            self.logger.debug('Importing output plugin ' + plugin_name)
+            __import__(plugin_name)
+
+        # Connect to inverter
+        ip = self.config.get('inverter', 'ip')
+        port = self.config.get('inverter', 'port')
+
+        for res in socket.getaddrinfo(ip, port, socket.AF_INET,
+                                      socket.SOCK_STREAM):
+            family, socktype, proto, canonname, sockadress = res
+            try:
+                self.logger.info('connecting to {0} port {1}'.format(ip, port))
+                inverter_socket = socket.socket(family, socktype, proto)
+                inverter_socket.settimeout(10)
+                inverter_socket.connect(sockadress)
+            except socket.error as msg:
+                self.logger.error('Could not open socket')
+                self.logger.error(msg)
+                sys.exit(1)
+
+        wifi_serial = self.config.getint('inverter', 'wifi_sn')
+        inverter_socket.sendall(OmnikExport.generate_string(wifi_serial))
+        data = inverter_socket.recv(1024)
+        inverter_socket.close()
+
+        msg = InverterMsg.InverterMsg(data)
+
+        self.logger.info("ID: {0}".format(msg.id))
+
+        for plugin in Plugin.plugins:
+            self.logger.debug('Run plugin' + plugin.__class__.__name__)
+            plugin.process_message(msg)
+
+    def build_logger(self, config):
         # Build logger
+        """
+        Build logger for this program
+
+
+        Args:
+            config: ConfigParser with settings from file
+        """
         log_levels = dict(debug=10, info=20, warning=30, error=40, critical=50)
         log_dict = {
             'version': 1,
@@ -46,7 +104,8 @@ class OmnikExport(object):
                 },
                 'file': {
                     'class': 'logging.FileHandler',
-                    'filename': mydir + '/' + config.get('log', 'filename'),
+                    'filename': self.__expand_path(config.get('log',
+                                                              'filename')),
                     'formatter': 'f'},
             },
             'loggers': {
@@ -56,50 +115,28 @@ class OmnikExport(object):
                 }
             }
         }
-
         logging.config.dictConfig(log_dict)
-        logger = logging.getLogger('OmnikLogger')
+        self.logger = logging.getLogger('OmnikLogger')
 
-        # Load output plugins
-        # Prepare path for plugin loading
-        sys.path.append('outputs')
+    def override_config(self, section, option, value):
+        """Override config settings"""
+        self.config.set(section, option, value)
 
-        Plugin.config = config
-        Plugin.logger = logger
-        for plugin_name in config.get('general', 'enabled_plugins').split(','):
-            plugin_name = plugin_name.strip()
-            logger.debug('Importing output plugin ' + plugin_name)
-            __import__(plugin_name)
+    @staticmethod
+    def __expand_path(path):
+        """
+        Expand relative path to absolute path.
 
-        # Connect to inverter
-        ip = config.get('inverter', 'ip')
-        port = config.get('inverter', 'port')
+        Args:
+            path: file path
 
-        for res in socket.getaddrinfo(ip, port, socket.AF_INET,
-                                      socket.SOCK_STREAM):
-            af, socktype, proto, canonname, sa = res
-            try:
-                logger.info('connecting to {0} port {1}'.format(ip, port))
-                inverter_socket = socket.socket(af, socktype, proto)
-                inverter_socket.settimeout(10)
-                inverter_socket.connect(sa)
-            except socket.error as msg:
-                logger.error('Could not open socket')
-                logger.error(msg)
-                sys.exit(1)
+        Returns: absolute path to file
 
-        wifi_serial = config.getint('inverter', 'wifi_sn')
-        inverter_socket.sendall(OmnikExport.generate_string(wifi_serial))
-        data = inverter_socket.recv(1024)
-        inverter_socket.close()
-
-        msg = InverterMsg.InverterMsg(data)
-
-        logger.info("ID: {0}".format(msg.id))
-
-        for plugin in Plugin.plugins:
-            logger.debug('Run plugin' + plugin.__class__.__name__)
-            plugin.process_message(msg)
+        """
+        if os.path.isabs(path):
+            return path
+        else:
+            return os.path.dirname(os.path.abspath(__file__)) + "/" + path
 
     @staticmethod
     def generate_string(serial_no):
@@ -129,4 +166,5 @@ class OmnikExport(object):
 
 
 if __name__ == "__main__":
-    OmnikExport.run()
+    omnik_exporter = OmnikExport('config.cfg')
+    omnik_exporter.run()
