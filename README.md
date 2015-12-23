@@ -39,4 +39,9 @@ Yes you can edit config-org.cfg directly. However if you want to update the
 script your settings will be overwritten with the default values. By creating 
 config.cfg, you can preserve your settings when upgrading.
 
-
+## Development
+To help with development when no sun is present a small simulator script can be
+found in the folder Development. This script works by reading values from to
+database used by de MysqlOutput, but with the time shifted 6 hours back. To use
+the simulator, you should use the MysqlOutput to fill the database and configure
+database settings in de sim-config.cfg file.

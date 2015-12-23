@@ -16,7 +16,7 @@ class PVoutputOutput(PluginLoader.Plugin):
         """
         now = datetime.datetime.now()
 
-        if (now.minute % 5) == 0:  # Only run at every 4 minute interval
+        if (now.minute % 5) == 0:  # Only run at every 5 minute interval
             self.logger.info('Uploading to PVoutput')
 
             url = "http://pvoutput.org/service/r2/addstatus.jsp"
