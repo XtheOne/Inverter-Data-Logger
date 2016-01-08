@@ -110,7 +110,7 @@ class OmnikExport(object):
             },
             'loggers': {
                 'OmnikLogger': {
-                    'handlers': config.get('log', 'type').split(),
+                    'handlers': config.get('log', 'type').split(','),
                     'level': log_levels[config.get('log', 'level')]
                 }
             }
