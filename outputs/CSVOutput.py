@@ -10,9 +10,10 @@ class CSVOutput(PluginLoader.Plugin):
         Args:
             msg (InverterMsg.InverterMsg): Message to process
         """
-        print "Id,Temp,VPV1,VPV2,VPV3,IPV1,IPV2,IPV3,IAC1,IAC2,IAC3," \
-              "VAC1,VAC2,VAC3,FAC1,PAC1,FAC2,PAC2,FAC3,PAC3," \
-              "ETODAY,ETOTAL,HTOTAL"
+        if not self.config.getboolean('csv', 'disable_header'):
+            print "Id,Temp,VPV1,VPV2,VPV3,IPV1,IPV2,IPV3,IAC1,IAC2,IAC3," \
+                  "VAC1,VAC2,VAC3,FAC1,PAC1,FAC2,PAC2,FAC3,PAC3," \
+                  "ETODAY,ETOTAL,HTOTAL"
 
         print ("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9}," +
                "{10},{11},{12},{13},{14},{15},{16},{17},{18},{19}," +
