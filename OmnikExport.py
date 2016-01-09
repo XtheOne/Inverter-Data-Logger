@@ -39,7 +39,7 @@ class OmnikExport(object):
 
         # Load output plugins
         # Prepare path for plugin loading
-        sys.path.append('outputs')
+        sys.path.append(self.__expand_path('outputs'))
 
         Plugin.config = self.config
         Plugin.logger = self.logger
