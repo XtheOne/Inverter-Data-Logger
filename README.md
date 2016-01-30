@@ -1,16 +1,19 @@
 # Omnik Data Logger
 =====
 Omnik Data Logger is a small script for uploading data from a Omniksol Solar 
-inverter, equipped with a wifi module, to a database and/or to PVoutput.org. 
+inverter or Hosola inverter, equipped with a wifi module from iGEN tech (solarmanpv.com), 
+to a database and/or to PVoutput.org. 
 
 This script is designed to be run as a cronjob every minute. Every time this
 script is run the data from the inverter will be send to the database. And with
 a five minute interval the data will also be uploaded to PVoutput.org as a live
 status.
+To enable Domoticz support, enable the DomoticzOutput plugin in the config file, and make sensors on dummy hardware and fill the idx of these sensors in the config file.
 
 ## Supported inverters
 Users reported that this script works for wifi kits with a s/n starting with
-602xxxxxx to 606xxxxxx. With wifi kits in the range 601xxxxxx it is not
+602xxxxxx to 606xxxxxx. Also tested with a Wifi kit in a Hosola inverter in the 611xxxxx range.
+With wifi kits in the range 601xxxxxx it is not
 possible to get the data directly from the inverter. So sniffing the data send
 to the omnik portal is required, see OmnikMQTT by wouterbaake
 (https://github.com/wouterbaake/OmnikMQTT) .
