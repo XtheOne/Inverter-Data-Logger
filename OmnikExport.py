@@ -9,6 +9,7 @@ import sys
 import logging
 import logging.config
 import ConfigParser
+import optparse
 import os
 from PluginLoader import Plugin
 import InverterMsg  # Import the Msg handler
@@ -32,6 +33,14 @@ class OmnikExport(object):
         self.config = ConfigParser.RawConfigParser()
         self.config.read(config_files)
 
+        # add command line option -p / --plugins to ovverride the output plugins used
+        parser = optparse.OptionParser()
+        parser.add_option('-p', '--plugins',
+                action="store", dest="plugins",
+                help="output plugins to use")
+
+        self.options, self.args = parser.parse_args()
+
     def run(self):
         """Get information from inverter and store is configured outputs."""
 
@@ -46,6 +55,11 @@ class OmnikExport(object):
 
         enabled_plugins = self.config.get('general', 'enabled_plugins')\
                                      .split(',')
+        
+        # if -p / --plugin option giving at command line, override enabled plugins
+        if self.options.plugins:
+            enabled_plugins = self.options.plugins.split(',')
+        
         for plugin_name in enabled_plugins:
             plugin_name = plugin_name.strip()
             self.logger.debug('Importing output plugin ' + plugin_name)
@@ -54,6 +68,7 @@ class OmnikExport(object):
         # Connect to inverter
         ip = self.config.get('inverter', 'ip')
         port = self.config.get('inverter', 'port')
+        timeout = self.config.getfloat('inverter', 'timeout')
 
         for res in socket.getaddrinfo(ip, port, socket.AF_INET,
                                       socket.SOCK_STREAM):
@@ -61,7 +76,7 @@ class OmnikExport(object):
             try:
                 self.logger.info('connecting to {0} port {1}'.format(ip, port))
                 inverter_socket = socket.socket(family, socktype, proto)
-                inverter_socket.settimeout(10)
+                inverter_socket.settimeout(timeout)
                 inverter_socket.connect(sockadress)
             except socket.error as msg:
                 self.logger.error('Could not open socket')
