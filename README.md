@@ -7,7 +7,27 @@ to a database, Domoticz and/or to PVoutput.org.
 This script is designed to be run as a cronjob (or scheduled tasks on Windows) every minute.
 Every time this script is run the data from the inverter will be send to the database.
 And with a five minute interval the data will also be uploaded to PVoutput.org as a live status.
-To enable Domoticz support, enable the DomoticzOutput plugin in the config file, and make sensors on dummy hardware and fill the Idx of these sensors in the config file.
+
+##
+To enable Domoticz support, enable the DomoticzOutput plugin in the config file.
+Then Create the following new hardware:
+Name: Inverter Virtual
+Type: Dummy (Does nothing, use for virtual switches only)
+Data Timeout: Disabled
+
+Now Create the following Virtual Sensors:
+Sensor Type                  - Name
+--------------------------------------------------
+Temperature                  - Inveter Temperature
+Voltage                      - Inveter DC Voltage PV1
+Voltage                      - Inveter DC Voltage PV2
+Ampere (1 Phase)             - Inveter DC Current PV1
+Ampere (1 Phase)             - Inveter DC Current PV2
+Voltage                      - Inveter AC Output Voltage
+Ampere (1 Phase)             - Inveter AC Output Current
+Electric (Instant + Counter) - Inveter Actual Output Power (after creation, set Type to 'Return')
+
+Now go to Devices and fill the Idx of these virtual sensors into the config file.
 
 ## Supported inverters
 Users reported that this script works for wifi kits with a s/n starting with
