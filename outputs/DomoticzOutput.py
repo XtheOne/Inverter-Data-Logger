@@ -31,7 +31,7 @@ class DomoticzOutput(PluginLoader.Plugin):
                 self.config.get('domoticz', 'string2current_idx'): msg.i_pv(2),
                 self.config.get('domoticz', 'AC_voltage_idx'): msg.v_ac(1),
                 self.config.get('domoticz', 'AC_current_idx'): msg.i_ac(1),
-                self.config.get('domoticz', 'Power_Lifetimeenergy_idx'): str(msg.p_ac(1)) + ';' + str(msg.e_total * 1000),
+                self.config.get('domoticz', 'Power_Lifetimeenergy_idx'): str(msg.p_ac(1)) + ';' + str(((((msg.e_today*10)-(int(msg.e_today*10)))/10)+msg.e_total) * 1000),
             }
 
         if all( [msg.v_ac(1)>0, msg.v_pv(1)>0] ): # don't sent data if inverter is in sleep mode
