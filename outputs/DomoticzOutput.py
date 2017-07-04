@@ -34,17 +34,18 @@ class DomoticzOutput(PluginLoader.Plugin):
                 self.config.get('domoticz', 'Power_Lifetimeenergy_idx'): str(msg.p_ac(1)) + ';' + str(msg.e_total * 1000),
             }
 
-        for idx, value in data_idx_array.items():
-                get_data = {
-                    'svalue': value,
-                    'type': 'command',
-                    'param': 'udevice',
-                    'idx' : idx,
-                    'nvalue': '0'
-                    }
-
-                get_data_encoded = urllib.urlencode(get_data)
-                self.logger.debug(url + '?' + get_data_encoded)
-                request_object = urllib2.Request(url + '?' + get_data_encoded)
-                response = urllib2.urlopen(request_object)
-                self.logger.debug(response.read())  # Show the response
+        if all( [msg.v_ac(1)>0, msg.v_pv(1)>0] ): # don't sent data if inverter is in sleep mode
+            for idx, value in data_idx_array.items():
+                    get_data = {
+                        'svalue': value,
+                        'type': 'command',
+                        'param': 'udevice',
+                        'idx' : idx,
+                        'nvalue': '0'
+                        }
+    
+                    get_data_encoded = urllib.urlencode(get_data)
+                    self.logger.debug(url + '?' + get_data_encoded)
+                    request_object = urllib2.Request(url + '?' + get_data_encoded)
+                    response = urllib2.urlopen(request_object)
+                    self.logger.debug(response.read())  # Show the response
