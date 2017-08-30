@@ -88,6 +88,9 @@ class OmnikExport(object):
         data = inverter_socket.recv(1024)
         inverter_socket.close()
 
+        #dump raw data to log
+        #self.logger.info('RAW Packet (len={0}): '.format(len(data))+':'.join(x.encode('hex') for x in data))
+
         msg = InverterMsg.InverterMsg(data)
 
         self.logger.info("ID: {0}".format(msg.id))
