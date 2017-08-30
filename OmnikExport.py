@@ -89,11 +89,12 @@ class OmnikExport(object):
         inverter_socket.close()
 
         #dump raw data to log
-        #self.logger.info('RAW Packet (len={0}): '.format(len(data))+':'.join(x.encode('hex') for x in data))
+        self.logger.info('RAW Packet (len={0}): '.format(len(data))+':'.join(x.encode('hex') for x in data))
 
         msg = InverterMsg.InverterMsg(data)
 
         self.logger.info("ID: {0}".format(msg.id))
+        self.logger.info("RUN State: {0}".format(msg.run_state))
 
         for plugin in Plugin.plugins:
             self.logger.debug('Run plugin' + plugin.__class__.__name__)
