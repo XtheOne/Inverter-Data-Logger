@@ -84,12 +84,17 @@ class OmnikExport(object):
                 sys.exit(1)
 
         wifi_serial = self.config.getint('inverter', 'wifi_sn')
-        inverter_socket.sendall(OmnikExport.generate_string(wifi_serial))
+        data = OmnikExport.generate_string(wifi_serial)
+        inverter_socket.sendall(data)
+
+        #dump raw data to log
+        self.logger.debug('RAW sent Packet (len={0}): '.format(len(data))+':'.join(x.encode('hex') for x in data))
+
         data = inverter_socket.recv(1024)
         inverter_socket.close()
 
         #dump raw data to log
-        self.logger.info('RAW Packet (len={0}): '.format(len(data))+':'.join(x.encode('hex') for x in data))
+        self.logger.debug('RAW received Packet (len={0}): '.format(len(data))+':'.join(x.encode('hex') for x in data))
 
         msg = InverterMsg.InverterMsg(data)
 
@@ -109,7 +114,7 @@ class OmnikExport(object):
         Args:
             config: ConfigParser with settings from file
         """
-        log_levels = dict(debug=10, info=20, warning=30, error=40, critical=50)
+        log_levels = dict(notset=0, debug=10, info=20, warning=30, error=40, critical=50)
         log_dict = {
             'version': 1,
             'formatters': {
@@ -172,13 +177,13 @@ class OmnikExport(object):
         Returns:
             str: Information request string for inverter
         """
-        response = '\x68\x02\x40\x30'
-
+        #response = '\x68\x02\x40\x30' # Old
+        response = '\x68\x02\x41\xb1' #from SolarMan / new Omnik
+        res_ck = sum([ord(c) for c in response])
         double_hex = hex(serial_no)[2:] * 2
         hex_list = [double_hex[i:i + 2].decode('hex') for i in
                     reversed(range(0, len(double_hex), 2))]
-
-        cs_count = 115 + sum([ord(c) for c in hex_list])
+        cs_count = 153 + res_ck + sum([ord(c) for c in hex_list])
         checksum = hex(cs_count)[-2:].decode('hex')
         response += ''.join(hex_list) + '\x01\x00' + checksum + '\x16'
         return response
