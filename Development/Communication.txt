@@ -23,7 +23,7 @@ ASCII: 192.168.224.34,ACCF2314DD10,1601299688
 Connect to TCP port 8899 of the WiFi-Kit IP.
 
 Then sent the following DATA (16 bytes).
-HEX: 68 02 41 b1  (Magic)
+HEX: 68 02 41 b1  (command header)
 HEX: e8 e4 71 5f  (reversed hex notation of the s/n)
 HEX: e8 e4 71 5f  (reversed hex notation of the s/n)
 HEX: 01 00        (End)
