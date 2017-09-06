@@ -20,6 +20,11 @@ class DomoticzOutput(PluginLoader.Plugin):
         port = self.config.get('domoticz', 'port')
         path = self.config.get('domoticz', 'path')
 
+        section_id = 'domoticz-'+msg.id
+        if not self.config.has_section(section_id):
+            self.logger.info('no section in configuration file for inverter with ID: {0}, skipping.'.format(msg.id))
+            return []
+
         url = ("http://" + host + ":" + port + path)
         self.logger.debug('url: '+url)
         self.logger.debug('temperature: '+str(msg.temperature)) # err:514,7
@@ -31,44 +36,44 @@ class DomoticzOutput(PluginLoader.Plugin):
 
 # the inverter gives 0 for voltage and current when in sleep mode, don't sent those values then to keep the graphs neat.
         data_idx_array = {
-            self.config.get('domoticz', 'Power_Lifetimeenergy_idx'): str(msg.p_ac(1))+';'+str(((((msg.e_today*10)-(int(msg.e_today*10)))/10)+msg.e_total)*1000),
+            self.config.get(section_id, 'Power_Lifetimeenergy_idx'): str(msg.p_ac(1))+';'+str(((((msg.e_today*10)-(int(msg.e_today*10)))/10)+msg.e_total)*1000),
         }
         # sometimes the inverter gives 514,7 as temperature, don't send temp then!
         if (msg.temperature<300):
             data_idx_array.update ({
-                self.config.get('domoticz', 'temp_idx'): msg.temperature,
+                self.config.get(section_id, 'temp_idx'): msg.temperature,
             })
         else: self.logger.debug('temperature out of range: '+str(msg.temperature))
         # sometimes the inverter gives 100 as current, don't send this then!
         if (msg.i_pv(1)<30):
             data_idx_array.update ({
-                self.config.get('domoticz', 'string1current_idx'): msg.i_pv(1),
+                self.config.get(section_id, 'string1current_idx'): msg.i_pv(1),
             })
         else: self.logger.debug('PV1 current out of range: '+str(msg.i_pv(1)))
         if (msg.i_pv(2)<30):
             data_idx_array.update ({
-                self.config.get('domoticz', 'string2current_idx'): msg.i_pv(2),
+                self.config.get(section_id, 'string2current_idx'): msg.i_pv(2),
             })
         else: self.logger.debug('PV2 current out of range: '+str(msg.i_pv(2)))
         # don't send PV voltages when 0.
         if (msg.v_pv(1)>0):
             data_idx_array.update ({
-                self.config.get('domoticz', 'string1voltage_idx'): msg.v_pv(1),
+                self.config.get(section_id, 'string1voltage_idx'): msg.v_pv(1),
             })
         else: self.logger.debug('PV1 voltage out of range: '+str(msg.v_pv(1)))
         if (msg.v_pv(2)>0):
             data_idx_array.update ({
-                self.config.get('domoticz', 'string2voltage_idx'): msg.v_pv(2),
+                self.config.get(section_id, 'string2voltage_idx'): msg.v_pv(2),
             })
         else: self.logger.debug('PV2 voltage out of range: '+str(msg.v_pv(2)))
         if (msg.i_ac(1)<30):
             data_idx_array.update ({
-                self.config.get('domoticz', 'AC_current_idx'): msg.i_ac(1),
+                self.config.get(section_id, 'AC_current_idx'): msg.i_ac(1),
             })
         else: self.logger.debug('AC current out of range: '+str(msg.i_ac(1)))
         if (msg.v_ac(1)>0): # drops to 0V when in sleep mode
             data_idx_array.update ({
-                self.config.get('domoticz', 'AC_voltage_idx'): msg.v_ac(1),
+                self.config.get(section_id, 'AC_voltage_idx'): msg.v_ac(1),
             })
         else: self.logger.debug('AC voltage out of range: '+str(msg.v_ac(1)))
 
