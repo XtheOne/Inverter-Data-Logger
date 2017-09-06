@@ -1,11 +1,11 @@
-# Omnik Data Logger
+# Inverter Data Logger
 =====
-Omnik Data Logger is a small script for uploading data from a Omniksol Solar 
-inverter or Hosola inverter, equipped with a wifi module from iGEN tech (solarmanpv.com), 
-to a database, Domoticz and/or to PVoutput.org. 
+Inverter Data Logger is a small script for uploading data from a Omniksol Solar 
+inverter or Hosola inverter, equipped with a wifi module or Wi-Fi data logger
+from iGEN tech (solarmanpv.com), to a database, Domoticz and/or to PVoutput.org.
 
 This script is designed to be run as a cronjob (or scheduled tasks on Windows) every minute.
-Every time this script is run the data from the inverter will be send to the database.
+Every time this script is run the data from the inverter(s) will be send to the database.
 And with a five minute interval the data will also be uploaded to PVoutput.org as a live status.
 
 ##
@@ -44,7 +44,7 @@ Omnikol-PV-Logger by t3kpunk (https://github.com/t3kpunk/Omniksol-PV-Logger).
 ## Installation and Setup
 
 * Install Python
-* Git clone the source with `git clone https://github.com/Woutrrr/Omnik-Data-Logger.git`
+* Git clone the source with `git clone https://github.com/XtheOne/Inverter-Data-Logger.git`
 * Copy the config-org.cfg to config.cfg
 * Change the settings in config.cfg
 * Test your settings with `python LiveStats.py`, when successful you should see
