@@ -90,20 +90,28 @@ class OmnikExport(object):
         #dump raw data to log
         self.logger.debug('RAW sent Packet (len={0}): '.format(len(data))+':'.join(x.encode('hex') for x in data))
 
-        data = inverter_socket.recv(1024)
-        inverter_socket.close()
+        okflag = False
+        while (not okflag):
 
-        #dump raw data to log
-        self.logger.debug('RAW received Packet (len={0}): '.format(len(data))+':'.join(x.encode('hex') for x in data))
-
-        msg = InverterMsg.InverterMsg(data)
-
-        self.logger.info("ID: {0}".format(msg.id))
-        self.logger.info("RUN State: {0}".format(msg.run_state))
-
-        for plugin in Plugin.plugins:
-            self.logger.debug('Run plugin' + plugin.__class__.__name__)
-            plugin.process_message(msg)
+            data = inverter_socket.recv(1500)
+    
+            #dump raw data to log
+            self.logger.debug('RAW received Packet (len={0}): '.format(len(data))+':'.join(x.encode('hex') for x in data))
+    
+            msg = InverterMsg.InverterMsg(data)
+    
+            if (msg.ok)[:9] == 'DATA SEND':
+                self.logger.debug("Exit Status: {0}".format(msg.ok))
+                inverter_socket.close()
+                okflag = True
+                continue
+    
+            self.logger.info("ID: {0}".format(msg.id))
+            self.logger.info("RUN State: {0}".format(msg.run_state))
+    
+            for plugin in Plugin.plugins:
+                self.logger.debug('Run plugin' + plugin.__class__.__name__)
+                plugin.process_message(msg)
 
     def build_logger(self, config):
         # Build logger
@@ -180,12 +188,14 @@ class OmnikExport(object):
         #response = '\x68\x02\x40\x30' # Old
         response = '\x68\x02\x41\xb1' #from SolarMan / new Omnik
         res_ck = sum([ord(c) for c in response])
+        footer = '\x01\x00' # x02\x00 geeft ERR= -1
+        foo_ck = sum([ord(c) for c in footer])
         double_hex = hex(serial_no)[2:] * 2
         hex_list = [double_hex[i:i + 2].decode('hex') for i in
                     reversed(range(0, len(double_hex), 2))]
-        cs_count = 153 + res_ck + sum([ord(c) for c in hex_list])
+        cs_count = 152 + res_ck + foo_ck + sum([ord(c) for c in hex_list])
         checksum = hex(cs_count)[-2:].decode('hex')
-        response += ''.join(hex_list) + '\x01\x00' + checksum + '\x16'
+        response += ''.join(hex_list) + footer + checksum + '\x16'
         return response
 
 

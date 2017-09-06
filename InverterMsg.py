@@ -63,6 +63,11 @@ class InverterMsg(object):
         return self.__get_string(15, 31)
 
     @property
+    def ok(self):
+        """received OK msg."""
+        return self.__get_string(12, 29)
+
+    @property
     def temperature(self):
         """Temperature recorded by the inverter."""
         return self.__get_short(31)
