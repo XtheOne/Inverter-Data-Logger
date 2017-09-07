@@ -8,6 +8,9 @@ This script is designed to be run as a cronjob (or scheduled tasks on Windows) e
 Every time this script is run the data from the inverter(s) will be send to the database.
 And with a five minute interval the data will also be uploaded to PVoutput.org as a live status.
 
+## Origin
+This is based on the original work of Wouterr and includes some improvements made by others.
+
 ##
 To enable Domoticz support, enable the DomoticzOutput plugin in the config file.
 Then Create the following new hardware:
