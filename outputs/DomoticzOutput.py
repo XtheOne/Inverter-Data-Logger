@@ -22,7 +22,7 @@ class DomoticzOutput(PluginLoader.Plugin):
 
         section_id = 'domoticz-'+msg.id
         if not self.config.has_section(section_id):
-            self.logger.info('no section in configuration file for inverter with ID: {0}, skipping.'.format(msg.id))
+            self.logger.error('no section in configuration file for inverter with ID: {0}, skipping.'.format(msg.id))
             return []
 
         url = ("http://" + host + ":" + port + path)
@@ -92,6 +92,10 @@ class DomoticzOutput(PluginLoader.Plugin):
             try:
                 response = urllib2.urlopen(request_object)
             except urllib2.HTTPError, e:
-                self.logger.debug('HTTP error : '+str(e.code)+' Reason: '+str(e.reason))
+                self.logger.error('HTTP error : '+str(e.code)+' Reason: '+str(e.reason))
+                return []
+            except urllib2.URLError, e:
+                self.logger.error('URL error : '+str(e.args)+' Reason: '+str(e.reason))
+                return []
             else:
                 self.logger.debug(response.read())  # Show the response

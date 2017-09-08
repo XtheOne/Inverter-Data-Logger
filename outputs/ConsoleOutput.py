@@ -10,9 +10,9 @@ class ConsoleOutput(PluginLoader.Plugin):
         Args:
             msg (InverterMsg.InverterMsg): Message to process
         """
-        print "ID: {0}".format(msg.id)
+        print "Inverter ID: {0}".format(msg.id)
 
-        print "E Today: {0:>5}   Total: {1:<5}".format(msg.e_today, msg.e_total)
+        print "E Today: {0:>5}   Total: {1:<5}".format(msg.e_today, ((((msg.e_today*10)-(int(msg.e_today*10)))/10)+msg.e_total))
         print "H Total: {0:>5}   Temp:  {1:<5}"\
             .format(msg.h_total, msg.temperature)
 

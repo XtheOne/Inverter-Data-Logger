@@ -12,7 +12,7 @@ class CSVOutput(PluginLoader.Plugin):
             msg (InverterMsg.InverterMsg): Message to process
         """
         if not self.config.getboolean('csv', 'disable_header'):
-            print "DateTime,Id,Temp,VPV1,VPV2,VPV3,IPV1,IPV2,IPV3,IAC1,IAC2,IAC3," \
+            print "DateTime,ID,Temp,VPV1,VPV2,VPV3,IPV1,IPV2,IPV3,IAC1,IAC2,IAC3," \
                   "VAC1,VAC2,VAC3,FAC1,PAC1,FAC2,PAC2,FAC3,PAC3," \
                   "ETODAY,ETOTAL,HTOTAL"
 
@@ -28,4 +28,4 @@ class CSVOutput(PluginLoader.Plugin):
                     msg.f_ac(1), msg.p_ac(1),
                     msg.f_ac(2), msg.p_ac(2),
                     msg.f_ac(3), msg.p_ac(3),
-                    msg.e_today, msg.e_total, msg.h_total)
+                    msg.e_today, ((((msg.e_today*10)-(int(msg.e_today*10)))/10)+msg.e_total), msg.h_total)
