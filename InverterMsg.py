@@ -68,6 +68,16 @@ class InverterMsg(object):
         return self.__get_string(12, 29)
 
     @property
+    def main_fwver(self):
+        """Inverter main firmware version."""
+        return self.__get_string(101, 116)
+
+    @property
+    def slave_fwver(self):
+        """Inverter slave firmware version."""
+        return self.__get_string(121, 130)
+
+    @property
     def temperature(self):
         """Temperature recorded by the inverter."""
         return self.__get_short(31)
