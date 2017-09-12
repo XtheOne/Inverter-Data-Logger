@@ -14,16 +14,16 @@ class DomoticzOutput(PluginLoader.Plugin):
             msg (InverterMsg.InverterMsg): Message to process
 
         """
-        self.logger.info('Uploading to Domoticz')
-
-        host = self.config.get('domoticz', 'host')
-        port = self.config.get('domoticz', 'port')
-        path = self.config.get('domoticz', 'path')
-
         section_id = 'domoticz-'+msg.id
         if not self.config.has_section(section_id):
             self.logger.error('no section in configuration file for inverter with ID: {0}, skipping.'.format(msg.id))
             return []
+
+        host = self.config.get(section_id, 'host')
+        port = self.config.get(section_id, 'port')
+        path = self.config.get(section_id, 'path')
+
+        self.logger.info('Uploading data from inverter with ID: {0} to Domoticz'.format(msg.id))
 
         url = ("http://" + host + ":" + port + path)
         self.logger.debug('url: '+url)
@@ -43,74 +43,74 @@ class DomoticzOutput(PluginLoader.Plugin):
             data_idx_array.update ({
                 self.config.get(section_id, 'temp_idx'): msg.temperature,
             })
-        else: self.logger.debug('temperature out of range: '+str(msg.temperature))
+        else: self.logger.debug('temperature out of range, or not defined: '+str(msg.temperature))
         # sometimes the inverter gives 100 as current, don't send this then!
         if (msg.i_pv(1)<30 and self.config.has_option(section_id, 'string1current_idx')):
             data_idx_array.update ({
                 self.config.get(section_id, 'string1current_idx'): msg.i_pv(1),
             })
-        else: self.logger.debug('PV1 current out of range: '+str(msg.i_pv(1)))
+        else: self.logger.debug('PV1 current out of range, or not defined: '+str(msg.i_pv(1)))
         if (msg.i_pv(2)<30 and self.config.has_option(section_id, 'string2current_idx')):
             data_idx_array.update ({
                 self.config.get(section_id, 'string2current_idx'): msg.i_pv(2),
             })
-        else: self.logger.debug('PV2 current out of range: '+str(msg.i_pv(2)))
+        else: self.logger.debug('PV2 current out of range, or not defined: '+str(msg.i_pv(2)))
         # don't send PV voltages when 0.
         if (msg.v_pv(1)>0 and self.config.has_option(section_id, 'string1voltage_idx')):
             data_idx_array.update ({
                 self.config.get(section_id, 'string1voltage_idx'): msg.v_pv(1),
             })
-        else: self.logger.debug('PV1 voltage out of range: '+str(msg.v_pv(1)))
+        else: self.logger.debug('PV1 voltage out of range, or not defined: '+str(msg.v_pv(1)))
         if (msg.v_pv(2)>0 and self.config.has_option(section_id, 'string2voltage_idx')):
             data_idx_array.update ({
                 self.config.get(section_id, 'string2voltage_idx'): msg.v_pv(2),
             })
-        else: self.logger.debug('PV2 voltage out of range: '+str(msg.v_pv(2)))
+        else: self.logger.debug('PV2 voltage out of range, or not defined: '+str(msg.v_pv(2)))
         if (msg.i_ac(1)<30 and self.config.has_option(section_id, 'AC1_current_idx')):
             data_idx_array.update ({
                 self.config.get(section_id, 'AC1_current_idx'): msg.i_ac(1),
             })
-        else: self.logger.debug('AC1 current out of range: '+str(msg.i_ac(1)))
+        else: self.logger.debug('AC1 current out of range, or not defined: '+str(msg.i_ac(1)))
         if (msg.i_ac(2)<30 and self.config.has_option(section_id, 'AC2_current_idx')):
             data_idx_array.update ({
                 self.config.get(section_id, 'AC2_current_idx'): msg.i_ac(2),
             })
-        else: self.logger.debug('AC2 current out of range: '+str(msg.i_ac(2)))
+        else: self.logger.debug('AC2 current out of range, or not defined: '+str(msg.i_ac(2)))
         if (msg.i_ac(3)<30 and self.config.has_option(section_id, 'AC3_current_idx')):
             data_idx_array.update ({
                 self.config.get(section_id, 'AC3_current_idx'): msg.i_ac(3),
             })
-        else: self.logger.debug('AC3 current out of range: '+str(msg.i_ac(3)))
+        else: self.logger.debug('AC3 current out of range, or not defined: '+str(msg.i_ac(3)))
         if (msg.v_ac(1)>0 and self.config.has_option(section_id, 'AC1_voltage_idx')): # drops to 0V when in sleep mode
             data_idx_array.update ({
                 self.config.get(section_id, 'AC1_voltage_idx'): msg.v_ac(1),
             })
-        else: self.logger.debug('AC1 voltage out of range: '+str(msg.v_ac(1)))
+        else: self.logger.debug('AC1 voltage out of range, or not defined: '+str(msg.v_ac(1)))
         if (msg.v_ac(2)>0 and self.config.has_option(section_id, 'AC2_voltage_idx')): # drops to 0V when in sleep mode
             data_idx_array.update ({
                 self.config.get(section_id, 'AC2_voltage_idx'): msg.v_ac(2),
             })
-        else: self.logger.debug('AC2 voltage out of range: '+str(msg.v_ac(2)))
+        else: self.logger.debug('AC2 voltage out of range, or not defined: '+str(msg.v_ac(2)))
         if (msg.v_ac(3)>0 and self.config.has_option(section_id, 'AC3_voltage_idx')): # drops to 0V when in sleep mode
             data_idx_array.update ({
                 self.config.get(section_id, 'AC3_voltage_idx'): msg.v_ac(3),
             })
-        else: self.logger.debug('AC3 voltage out of range: '+str(msg.v_ac(3)))
+        else: self.logger.debug('AC3 voltage out of range, or not defined: '+str(msg.v_ac(3)))
         if (msg.f_ac(1)<70 and self.config.has_option(section_id, 'AC1_frequency_idx')):
             data_idx_array.update ({
                 self.config.get(section_id, 'AC1_frequency_idx'): msg.f_ac(1),
             })
-        else: self.logger.debug('AC1 frequency out of range: '+str(msg.f_ac(1)))
+        else: self.logger.debug('AC1 frequency out of range, or not defined: '+str(msg.f_ac(1)))
         if (msg.f_ac(2)<70 and self.config.has_option(section_id, 'AC2_frequency_idx')):
             data_idx_array.update ({
                 self.config.get(section_id, 'AC2_frequency_idx'): msg.f_ac(2),
             })
-        else: self.logger.debug('AC2 frequency out of range: '+str(msg.f_ac(2)))
+        else: self.logger.debug('AC2 frequency out of range, or not defined: '+str(msg.f_ac(2)))
         if (msg.f_ac(3)<70 and self.config.has_option(section_id, 'AC3_frequency_idx')):
             data_idx_array.update ({
                 self.config.get(section_id, 'AC3_frequency_idx'): msg.f_ac(3),
             })
-        else: self.logger.debug('AC3 frequency out of range: '+str(msg.f_ac(3)))
+        else: self.logger.debug('AC3 frequency out of range, or not defined: '+str(msg.f_ac(3)))
 
         for idx, value in data_idx_array.items():
             get_data = {
