@@ -1,16 +1,17 @@
-Wi-Fi Kit data:
+Wi-Fi Kit (inside Omnik 4000TL2) data:
 IP: 192.168.224.34
 MAC: ACCF2314DD11
 S/N: 1601299688 = hex:5F71E4E8 = rev hex:E8E4715F
 
 Inverter S/N: NLBN4020146J3002
 
+--- To find the logger(s) on the network ---
+Sent UDP data to (local) BROADCAST address and port: 48899 to query WiFi-Kit data logger(s)
 
-Sent UDP data to BROADCAST address and port: 48899 to query WiFi-Kit data logger(s)
-
-Data to send to port 48899:
+Datagram to send to UDP port 48899:
 HEX: 57 49 46 49 4b 49 54 2d 32 31 34 30 32 38 2d 52 45 41 44
 ASCII: WIFIKIT-214028-READ
+(Fun part: 214028 is the postal code of the city where the iGEN factory is located :-)
 
 The WiFi-Kit will respond with a UDP datagram containing it's IP address, Base MAC address and S/N:
 
@@ -18,24 +19,28 @@ HEX: 31 39 32 2e 31 36 38 2e 32 32 34 2e 33 34 2c 41 43 43 46 32 33 31 34 44 44 
 ASCII: 192.168.224.34,ACCF2314DD10,1601299688
 
 
+These response data frames are the same as sent to www.solarmandata.com:10004 and/or a specified server/port in the logger server config page.
+Only the last OK frame is different, The logger firmware version is sent
 
+--- To get data from the logger ---
+Connect to TCP port 8899 on the WiFi-Kit IP.
 
-Connect to TCP port 8899 of the WiFi-Kit IP.
-
-Then sent the following DATA (16 bytes).
+Then sent the following DATA (16 bytes) to trigger the logger.
 HEX: 68 02 41 b1  (command header)
-HEX: e8 e4 71 5f  (reversed hex notation of the s/n)
-HEX: e8 e4 71 5f  (reversed hex notation of the s/n)
-HEX: 01 00        (End)
+HEX: e8 e4 71 5f  (reversed hex notation of the logger s/n)
+HEX: e8 e4 71 5f  (reversed hex notation of the logger s/n)
+HEX: 01 00        (command end?)
 HEX: 2d           (checksum)
 HEX: 16           (Data end flag)
 
-Response (183 bytes):
-HEX: 68 a9 41 b0 
-HEX: e8 e4 71 5f
-HEX: e8 e4 71 5f
-HEX: 81 02 01 4e
-HEX: 4c 42 4e 34 30 32 30 31 34 36 4a 33 30 30 32  LBN4020146J3002
+
+This response frame is repeated for every connected inverter. (also to a server)
+Response (183 bytes): (143 bytes from older logger)
+HEX: 68 a9 41 b0  (command header)
+HEX: e8 e4 71 5f  (reversed hex notation of the logger s/n)
+HEX: e8 e4 71 5f  (reversed hex notation of the logger s/n)
+HEX: 81 02 01     (command end)
+HEX: 4e 4c 42 4e 34 30 32 30 31 34 36 4a 33 30 30 32  (Inverter Serial)
 HEX: 01 31  Temp
 HEX: 0a 94  PV_V1
 HEX: 0a 2c  PV_V2
@@ -55,16 +60,43 @@ HEX: 00 00  AC_F2
 HEX: 00 00  AC_P2
 HEX: 00 00  AC_F3
 HEX: 00 00  AC_P3
-HEX: 00 2b e_today
-HEX: 00 00 70 9a e_total
-HEX: 00 00 15 dd h_total
-HEX: 00 01 RUN state? (79)
-HEX: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-HEX: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-HEX: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-HEX: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-HEX: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-HEX: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
-HEX: 00 00 00 00
-HEX: f4 (checksum)
-HEX: 16 (Data end flag)
+HEX: 00 2b  e_today
+HEX: 00 00 70 9a  e_total
+HEX: 00 00 15 dd  h_total
+HEX: 00 01  RUN state (79)
+HEX: 00 00  PV_?1 (81)
+HEX: 00 00  PV_?2 (83)
+HEX: 00 00  PV_?3 (85)
+HEX: 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ??? (87)
+HEX: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  Inverter main firmware version (101)
+HEX: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  Inverter slave firmware version (117)
+HEX: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ??? (133) (not in older loggers)
+HEX: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ??? (149) (not in older loggers)
+HEX: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ??? (165) (not in older loggers)
+HEX: f4  (checksum)
+HEX: 16  (Data end flag)
+
+
+This response frame is send after all data is sent.
+Response (99 bytes):
+HEX: 68 11 41 f0  (command header)
+HEX: e8 e4 71 5f  (reversed hex notation of the logger s/n)
+HEX: e8 e4 71 5f  (reversed hex notation of the logger s/n)
+HEX: 44 41 54 41 20 53 45 4e 44 20 49 53 20 4f 4b 0d 0a    DATA SEND IS OK
+HEX: 6b  (checksum)
+HEX: 16  (Data end flag)
+HEX: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+HEX: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+HEX: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+HEX: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+
+
+This data frame is send after all data is sent to a server.
+Response (55 bytes):
+HEX: 68 29 51 b1  (command header)
+HEX: de 3d 10 1e  (reversed hex notation of the logger s/n)
+HEX: de 3d 10 1e  (reversed hex notation of the logger s/n)
+HEX: 80 01  (command end)
+HEX: 48 34 2e 30 31 2e 35 31 59 34 2e 30 2e 30 31 57 31 2e 30 2e 34 38 28 32 30 31 36 2d 30 31 2d 32 38 31 2d 44 29 00 00  H4.01.51Y4.0.01W1.0.48(2016-01-281-D)
+HEX: b8  (checksum)
+HEX: 16  (Data end flag)

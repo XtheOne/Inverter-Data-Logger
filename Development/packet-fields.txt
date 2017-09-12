@@ -34,3 +34,5 @@ slave_fwver    121       9       1       Inverter slave firmware version.
 
 checksum    (len-1)      1       1       
 footer        (len)      1       1       hex(16)
+
+Unknown is still where the Error status bits are...
