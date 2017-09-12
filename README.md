@@ -1,12 +1,13 @@
 # Inverter Data Logger
 =====
-Inverter Data Logger is a small script for uploading data from a Omniksol Solar 
-inverter or Hosola inverter, equipped with a wifi module or Wi-Fi data logger
+Inverter Data Logger is a small script for uploading data from a 
+Omnik, Hosola, Goodwe, Solax, Ginlong, Samil, Sofar or Power-One
+Solar inverter, equipped with a wifi module or connected to a Wi-Fi data logger
 from iGEN tech (solarmanpv.com), to a database, Domoticz and/or to PVoutput.org.
 
 This script is designed to be run as a cronjob (or scheduled tasks on Windows) every minute.
-Every time this script is run the data from the inverter(s) will be send to the database.
-And with a five minute interval the data will also be uploaded to PVoutput.org as a live status.
+Every time this script is run the data from the inverter(s) will be send to the enabled plugin(s).
+And with a five minute interval the data will also be uploaded to PVoutput.org as a live status when enabled.
 
 ## Origin
 This is based on the original work of Wouterr and includes some improvements made by others.
