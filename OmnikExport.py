@@ -105,7 +105,13 @@ class OmnikExport(object):
                 inverter_socket.close()
                 okflag = True
                 continue
-    
+
+            if (msg.ok)[:11] == 'NO INVERTER':
+                self.logger.debug("Inverter(s) are in sleep mode: {0} received".format(msg.ok))
+                inverter_socket.close()
+                okflag = True
+                continue
+
             self.logger.info("Inverter ID: {0}".format(msg.id))
             self.logger.info("Inverter main firmware version: {0}".format(msg.main_fwver))
             self.logger.info("Inverter slave firmware version: {0}".format(msg.slave_fwver))

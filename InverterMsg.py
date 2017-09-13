@@ -65,7 +65,7 @@ class InverterMsg(object):
     @property
     def ok(self):
         """received OK msg."""
-        return self.__get_string(12, 29)
+        return self.__get_string(12, 31).split('\r\n')[0]
 
     @property
     def main_fwver(self):
