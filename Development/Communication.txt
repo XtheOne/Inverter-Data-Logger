@@ -18,6 +18,7 @@ The WiFi-Kit will respond with a UDP datagram containing it's IP address, Base M
 HEX: 31 39 32 2e 31 36 38 2e 32 32 34 2e 33 34 2c 41 43 43 46 32 33 31 34 44 44 31 30 2c 31 36 30 31 32 39 39 36 38 38
 ASCII: 192.168.224.34,ACCF2314DD10,1601299688
 
+#command header = Command byte, reply id/version, ???, ???
 
 These response data frames are the same as sent to www.solarmandata.com:10004 and/or a specified server/port in the logger server config page.
 Only the last OK frame is different, The logger firmware version is sent
@@ -101,7 +102,7 @@ HEX: 62  (checksum)
 HEX: 16  (Data end flag)
 
 
-This data frame is send after all data is sent to a server.
+This data frame is send after all data is sent to a server. It contains the firmware version of the logger.
 Response (55 bytes):
 HEX: 68 29 51 b1  (command header)
 HEX: de 3d 10 1e  (reversed hex notation of the logger s/n)
