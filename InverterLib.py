@@ -1,4 +1,5 @@
 import socket
+import os
 
 def getNetworkIp():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -33,3 +34,18 @@ def generate_string(serial_no):
     checksum = hex(cs_count)[-2:].decode('hex')
     response += ''.join(hex_list) + footer + checksum + '\x16'
     return response
+
+def expand_path(path):
+    """
+    Expand relative path to absolute path.
+
+    Args:
+        path: file path
+
+    Returns: absolute path to file
+
+    """
+    if os.path.isabs(path):
+        return path
+    else:
+        return os.path.dirname(os.path.abspath(__file__)) + "/" + path

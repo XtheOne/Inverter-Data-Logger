@@ -1,10 +1,9 @@
 #!/usr/bin/python
 """OmnikExport program.
 
-Get data from an omniksol inverter with 602xxxxx - 606xxxx ans save the data in
-a database or push to pvoutput.org.
+Get data from a Wi-Fi kit logger and save/send the data to the defined plugin(s)
 """
-import socket  # Needed for talking to inverter
+import socket  # Needed for talking to logger
 import sys
 import logging
 import logging.config
@@ -13,11 +12,11 @@ import optparse
 import os
 from PluginLoader import Plugin
 import InverterMsg  # Import the Msg handler
-
+import InverterLib  # Import the library
 
 class OmnikExport(object):
     """
-    Get data from Omniksol inverter and store the data in a configured output
+    Get data from the inverter(s) and store the data in a configured output
     format/location.
 
     """
@@ -27,13 +26,13 @@ class OmnikExport(object):
 
     def __init__(self, config_file):
         # Load the setting
-        config_files = [self.__expand_path('config-default.cfg'),
-                        self.__expand_path(config_file)]
+        config_files = [InverterLib.expand_path('config-default.cfg'),
+                        InverterLib.expand_path(config_file)]
 
         self.config = ConfigParser.RawConfigParser()
         self.config.read(config_files)
 
-        # add command line option -p / --plugins to ovverride the output plugins used
+        # add command line option -p / --plugins to override the output plugins used
         parser = optparse.OptionParser()
         parser.add_option('-p', '--plugins',
                 action="store", dest="plugins",
@@ -48,7 +47,7 @@ class OmnikExport(object):
 
         # Load output plugins
         # Prepare path for plugin loading
-        sys.path.append(self.__expand_path('outputs'))
+        sys.path.append(InverterLib.expand_path('outputs'))
 
         Plugin.config = self.config
         Plugin.logger = self.logger
@@ -65,27 +64,27 @@ class OmnikExport(object):
             self.logger.debug('Importing output plugin ' + plugin_name)
             __import__(plugin_name)
 
-        # Connect to inverter
-        ip = self.config.get('inverter', 'ip')
-        port = self.config.get('inverter', 'port')
-        timeout = self.config.getfloat('inverter', 'timeout')
+        # Connect to logger
+        ip = self.config.get('logger', 'ip')
+        port = self.config.get('logger', 'port')
+        timeout = self.config.getfloat('logger', 'timeout')
 
         for res in socket.getaddrinfo(ip, port, socket.AF_INET,
                                       socket.SOCK_STREAM):
             family, socktype, proto, canonname, sockadress = res
             try:
                 self.logger.info('connecting to {0} port {1}'.format(ip, port))
-                inverter_socket = socket.socket(family, socktype, proto)
-                inverter_socket.settimeout(timeout)
-                inverter_socket.connect(sockadress)
+                logger_socket = socket.socket(family, socktype, proto)
+                logger_socket.settimeout(timeout)
+                logger_socket.connect(sockadress)
             except socket.error as msg:
                 self.logger.error('Could not open socket')
                 self.logger.error(msg)
                 sys.exit(1)
 
-        wifi_serial = self.config.getint('inverter', 'wifi_sn')
-        data = OmnikExport.generate_string(wifi_serial)
-        inverter_socket.sendall(data)
+        wifi_serial = self.config.getint('logger', 'wifi_sn')
+        data = InverterLib.generate_string(int(wifi_serial))
+        logger_socket.sendall(data)
 
         #dump raw data to log
         self.logger.debug('RAW sent Packet (len={0}): '.format(len(data))+':'.join(x.encode('hex') for x in data))
@@ -93,7 +92,7 @@ class OmnikExport(object):
         okflag = False
         while (not okflag):
 
-            data = inverter_socket.recv(1500)
+            data = logger_socket.recv(1500)
     
             #dump raw data to log
             self.logger.debug('RAW received Packet (len={0}): '.format(len(data))+':'.join(x.encode('hex') for x in data))
@@ -102,13 +101,13 @@ class OmnikExport(object):
     
             if (msg.ok)[:9] == 'DATA SEND':
                 self.logger.debug("Exit Status: {0}".format(msg.ok))
-                inverter_socket.close()
+                logger_socket.close()
                 okflag = True
                 continue
 
             if (msg.ok)[:11] == 'NO INVERTER':
                 self.logger.debug("Inverter(s) are in sleep mode: {0} received".format(msg.ok))
-                inverter_socket.close()
+                logger_socket.close()
                 okflag = True
                 continue
 
@@ -144,7 +143,7 @@ class OmnikExport(object):
                 },
                 'file': {
                     'class': 'logging.FileHandler',
-                    'filename': self.__expand_path(config.get('log',
+                    'filename': InverterLib.expand_path(config.get('log',
                                                               'filename')),
                     'formatter': 'f'},
             },
@@ -161,51 +160,6 @@ class OmnikExport(object):
     def override_config(self, section, option, value):
         """Override config settings"""
         self.config.set(section, option, value)
-
-    @staticmethod
-    def __expand_path(path):
-        """
-        Expand relative path to absolute path.
-
-        Args:
-            path: file path
-
-        Returns: absolute path to file
-
-        """
-        if os.path.isabs(path):
-            return path
-        else:
-            return os.path.dirname(os.path.abspath(__file__)) + "/" + path
-
-    @staticmethod
-    def generate_string(serial_no):
-        """Create request string for inverter.
-
-        The request string is build from several parts. The first part is a
-        fixed 4 char string; the second part is the reversed hex notation of
-        the s/n twice; then again a fixed string of two chars; a checksum of
-        the double s/n with an offset; and finally a fixed ending char.
-
-        Args:
-            serial_no (int): Serial number of the inverter
-
-        Returns:
-            str: Information request string for inverter
-        """
-        #response = '\x68\x02\x40\x30' # Old
-        response = '\x68\x02\x41\xb1' #from SolarMan / new Omnik
-        res_ck = sum([ord(c) for c in response])
-        footer = '\x01\x00' # x02\x00 geeft ERR= -1
-        foo_ck = sum([ord(c) for c in footer])
-        double_hex = hex(serial_no)[2:] * 2
-        hex_list = [double_hex[i:i + 2].decode('hex') for i in
-                    reversed(range(0, len(double_hex), 2))]
-        cs_count = 152 + res_ck + foo_ck + sum([ord(c) for c in hex_list])
-        checksum = hex(cs_count)[-2:].decode('hex')
-        response += ''.join(hex_list) + footer + checksum + '\x16'
-        return response
-
 
 if __name__ == "__main__":
     omnik_exporter = OmnikExport('config.cfg')
