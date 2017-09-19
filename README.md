@@ -20,23 +20,25 @@ Type: Dummy (Does nothing, use for virtual switches only)
 Data Timeout: Disabled
 
 Now Create the following Virtual Sensors:
-Sensor Type                  - Name
---------------------------------------------------
-Temperature                  - Inveter Temperature
-Voltage                      - Inveter DC Voltage PV1
-Voltage                      - Inveter DC Voltage PV2
-Ampere (1 Phase)             - Inveter DC Current PV1
-Ampere (1 Phase)             - Inveter DC Current PV2
-Voltage                      - Inveter AC Output Voltage
-Ampere (1 Phase)             - Inveter AC Output Current
-Electric (Instant + Counter) - Inveter Actual Output Power (after creation, set Type to 'Return')
+Identifier                     Sensor Type                  - Name
+---------------------------------------------------------------------------------
+Power_Lifetimeenergy_idx       Electric (Instant + Counter) - Inveter Actual Output Power (after creation, set Type to 'Return')
+temp_idx                       Temperature (LaCrosse TX3)   - Inveter Temperature
+string1voltage_idx             Voltage                      - Inveter DC Voltage PV1
+string2voltage_idx             Voltage                      - Inveter DC Voltage PV2
+string1current_idx             Ampere (1 Phase)             - Inveter DC Current PV1
+string2current_idx             Ampere (1 Phase)             - Inveter DC Current PV2
+AC1_voltage_idx                Voltage                      - Inveter AC Output Voltage
+AC1_Current_idx                Ampere (1 Phase)             - Inveter AC Output Current
 
 Now go to Devices and fill the Idx of these virtual sensors into the config file.
+This is for a single phase with 2 strings inverter and basic values, more virtual sensors can be added for other identifiers.
 
 ## Supported inverters
 Users reported that this script works for wifi kits with a s/n starting with
 602xxxxxx to 606xxxxxx. Also tested with a Wifi kit in a Hosola inverter in the 611xxxxx range.
 Also works for newer 1601xxxxxx WiFi kit as used in the Omnik TL2 inverters.
+Also works with iGEN Wi-Fi external loggers with s/n starting with 504xxxxxx
 With wifi kits in the range 601xxxxxx it is not
 possible to get the data directly from the inverter. So sniffing the data send
 to the omnik portal is required, see OmnikMQTT by wouterbaake
