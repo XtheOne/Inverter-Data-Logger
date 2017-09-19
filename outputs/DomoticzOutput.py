@@ -181,13 +181,13 @@ class DomoticzOutput(PluginLoader.Plugin):
             get_data_encoded = urllib.urlencode(get_data)
             self.logger.debug(url + '?' + get_data_encoded)
             request_object = urllib2.Request(url + '?' + get_data_encoded)
-#            try:
-#                response = urllib2.urlopen(request_object)
-#            except urllib2.HTTPError, e:
-#                self.logger.error('HTTP error : '+str(e.code)+' Reason: '+str(e.reason))
-#                return []
-#            except urllib2.URLError, e:
-#                self.logger.error('URL error : '+str(e.args)+' Reason: '+str(e.reason))
-#                return []
-#            else:
-#                self.logger.debug(response.read())  # Show the response
+            try:
+                response = urllib2.urlopen(request_object)
+            except urllib2.HTTPError, e:
+                self.logger.error('HTTP error : '+str(e.code)+' Reason: '+str(e.reason))
+                return []
+            except urllib2.URLError, e:
+                self.logger.error('URL error : '+str(e.args)+' Reason: '+str(e.reason))
+                return []
+            else:
+                self.logger.debug(response.read())  # Show the response
