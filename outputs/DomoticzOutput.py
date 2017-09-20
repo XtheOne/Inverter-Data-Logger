@@ -61,7 +61,7 @@ class DomoticzOutput(PluginLoader.Plugin):
         else: self.logger.debug('E_today not defined: '+str(msg.e_today)+' kWh')
         if (self.config.has_option(section_id, 'E_total_idx')):
             data_idx_array.update ({
-                self.config.get(section_id, 'E_total_idx'): str(e_total*1000),
+                self.config.get(section_id, 'E_total_idx'): e_total*1000,
             })
         else: self.logger.debug('E_total not defined: '+str(e_total)+' kWh')
 
@@ -87,6 +87,11 @@ class DomoticzOutput(PluginLoader.Plugin):
                 self.config.get(section_id, 'string3current_idx'): msg.i_pv(3),
             })
         else: self.logger.debug('PV3 current out of range, or not defined: '+str(msg.i_pv(3))+' Ampere')
+        if (self.config.has_option(section_id, 'string123current_idx')):
+            data_idx_array.update ({
+                self.config.get(section_id, 'string123current_idx'): str(msg.i_pv(1))+';'+str(msg.i_pv(2))+';'+str(msg.i_pv(3)),
+            })
+        else: self.logger.debug('PV1/2/3 current not defined: '+str(msg.i_pv(1))+'/'+str(msg.i_pv(2))+'/'+str(msg.i_pv(3))+' Ampere')
         # Send v_pv(1-3)
         # don't send PV voltages when 0.
         if (msg.v_pv(1)>0 and self.config.has_option(section_id, 'string1voltage_idx')):
@@ -120,6 +125,11 @@ class DomoticzOutput(PluginLoader.Plugin):
                 self.config.get(section_id, 'AC3_current_idx'): msg.i_ac(3),
             })
         else: self.logger.debug('AC3 current out of range, or not defined: '+str(msg.i_ac(3))+' Ampere')
+        if (self.config.has_option(section_id, 'AC123_current_idx')):
+            data_idx_array.update ({
+                self.config.get(section_id, 'AC123_current_idx'): str(msg.i_ac(1))+';'+str(msg.i_ac(2))+';'+str(msg.i_ac(3)),
+            })
+        else: self.logger.debug('AC1/2/3 current not defined: '+str(msg.i_ac(1))+'/'+str(msg.i_ac(2))+'/'+str(msg.i_ac(3))+' Ampere')
         # Send v_ac(1-3)
         if (msg.v_ac(1)>0 and self.config.has_option(section_id, 'AC1_voltage_idx')): # drops to 0V when in sleep mode
             data_idx_array.update ({

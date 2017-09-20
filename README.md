@@ -20,16 +20,24 @@ Type: Dummy (Does nothing, use for virtual switches only)
 Data Timeout: Disabled
 
 Now Create the following Virtual Sensors:
-Identifier                     Sensor Type                  - Name
+Identifier                     Sensor Type                   Name
 ---------------------------------------------------------------------------------
-Power_Lifetimeenergy_idx       Electric (Instant + Counter) - Inveter Actual Output Power (after creation, set Type to 'Return')
-temp_idx                       Temperature (LaCrosse TX3)   - Inveter Temperature
-string1voltage_idx             Voltage                      - Inveter DC Voltage PV1
-string2voltage_idx             Voltage                      - Inveter DC Voltage PV2
-string1current_idx             Ampere (1 Phase)             - Inveter DC Current PV1
-string2current_idx             Ampere (1 Phase)             - Inveter DC Current PV2
-AC1_voltage_idx                Voltage                      - Inveter AC Output Voltage
-AC1_Current_idx                Ampere (1 Phase)             - Inveter AC Output Current
+Power_Lifetimeenergy_idx       Electric (Instant + Counter)  Actual Output Power (after creation, set Type to 'Return')
+string1voltage_idx             Voltage                       DC Voltage PV1
+string2voltage_idx             Voltage                       DC Voltage PV2
+string1current_idx             Ampere (1 Phase)              DC Current PV1
+string2current_idx             Ampere (1 Phase)              DC Current PV2
+AC1_voltage_idx                Voltage                       AC Output Voltage
+AC1_Current_idx                Ampere (1 Phase)              AC Output Current
+AC1_Power_idx                  Usage (Electric)              AC Output Power
+AC1_frequency_idx              Custom Sensor (Hertz)         AC Frequency
+--- Some optional sensors ---
+temp_idx                       Temperature                   Temperature
+H_total_idx                    Custom Sensor (Hours)         Total run Hours
+#string123current_idx          Ampere (3 Phase)              DC Current PV1/2/3
+AC123_Current_idx              Ampere (3 Phase)              AC 1/2/3 Output Current
+E_today_idx                    Counter                       Daily production (after creation, set Type to 'Energy Generated')
+E_total_idx                    Counter                       Total Production (after creation, set Type to 'Energy Generated')
 
 Now go to Devices and fill the Idx of these virtual sensors into the config file.
 This is for a single phase with 2 strings inverter and basic values, more virtual sensors can be added for other identifiers.
