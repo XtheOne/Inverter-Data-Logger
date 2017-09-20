@@ -12,4 +12,12 @@
 ## App specific
 config.cfg
 omnik-export.log
+inverter-export.log
 Development/sim-config.cfg
+## ignore all subfolders
+Development/**
+!Development/*
+
+## WireShark
+*.pcap
+*.pcapng
