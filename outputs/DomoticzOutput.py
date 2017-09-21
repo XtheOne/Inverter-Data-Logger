@@ -56,15 +56,19 @@ class DomoticzOutput(PluginLoader.Plugin):
         # Send  e_today and e_total in Wh and h_total in h
         if (self.config.has_option(section_id, 'E_today_idx')):
             data_idx_array.update ({
-                self.config.get(section_id, 'E_today_idx'): msg.e_today*1000,
+                self.config.get(section_id, 'E_today_idx'): msg.e_today,
             })
         else: self.logger.debug('E_today not defined: '+str(msg.e_today)+' kWh')
         if (self.config.has_option(section_id, 'E_total_idx')):
             data_idx_array.update ({
-                self.config.get(section_id, 'E_total_idx'): e_total*1000,
+                self.config.get(section_id, 'E_total_idx'): e_total,
             })
         else: self.logger.debug('E_total not defined: '+str(e_total)+' kWh')
-
+        if (self.config.has_option(section_id, 'E_total_c_idx')):
+            data_idx_array.update ({
+                self.config.get(section_id, 'E_total_c_idx'): e_total*1000,
+            })
+        else: self.logger.debug('E_total c_not defined: '+str(e_total)+' kWh')
         if (self.config.has_option(section_id, 'H_total_idx')):
             data_idx_array.update ({
                 self.config.get(section_id, 'H_total_idx'): msg.h_total,
@@ -162,6 +166,11 @@ class DomoticzOutput(PluginLoader.Plugin):
                 self.config.get(section_id, 'AC3_Power_idx'): msg.p_ac(3),
             })
         else: self.logger.debug('AC3 power out of range, or not defined: '+str(msg.p_ac(3))+' Watt')
+        if (self.config.has_option(section_id, 'AC123_Power_idx')):
+            data_idx_array.update ({
+                self.config.get(section_id, 'AC123_Power_idx'): p_ac_t,
+            })
+        else: self.logger.debug('AC123 power not defined: '+str(p_ac_t)+' Watt')
         # Send f_ac(1-3)
         if (msg.f_ac(1)<70 and self.config.has_option(section_id, 'AC1_frequency_idx')):
             data_idx_array.update ({

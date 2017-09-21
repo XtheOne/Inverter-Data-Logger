@@ -22,7 +22,7 @@ Data Timeout: Disabled
 Now Create the following Virtual Sensors:
 Identifier                     Sensor Type                   Name
 ---------------------------------------------------------------------------------
-Power_Lifetimeenergy_idx       Electric (Instant + Counter)  Actual Output Power (after creation, set Type to 'Return')
+Power_Lifetimeenergy_idx       Electric (Instant + Counter)  Actual Output Power (after creation, set 'Type:' to 'Return' and 'Energy read:' to 'From device')
 string1voltage_idx             Voltage                       DC Voltage PV1
 string2voltage_idx             Voltage                       DC Voltage PV2
 string1current_idx             Ampere (1 Phase)              DC Current PV1
@@ -36,8 +36,10 @@ temp_idx                       Temperature                   Temperature
 H_total_idx                    Custom Sensor (Hours)         Total run Hours
 #string123current_idx          Ampere (3 Phase)              DC Current PV1/2/3
 AC123_Current_idx              Ampere (3 Phase)              AC 1/2/3 Output Current
-E_today_idx                    Counter                       Daily production (after creation, set Type to 'Energy Generated')
-E_total_idx                    Counter                       Total Production (after creation, set Type to 'Energy Generated')
+AC123_Power_idx                Usage (Electric)              AC Output Power (total for 3 phase inverter)
+E_today_idx                    Custom Sensor (kWh)           Energy today
+E_total_idx                    Custom Sensor (kWh)           Total Energy
+E_total_c_idx                  Counter                       Energy production (after creation, set Type to 'Energy Generated')
 
 Now go to Devices and fill the Idx of these virtual sensors into the config file.
 This is for a single phase with 2 strings inverter and basic values, more virtual sensors can be added for other identifiers.
