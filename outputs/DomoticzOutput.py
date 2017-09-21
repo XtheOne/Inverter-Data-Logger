@@ -172,17 +172,17 @@ class DomoticzOutput(PluginLoader.Plugin):
             })
         else: self.logger.debug('AC123 power not defined: '+str(p_ac_t)+' Watt')
         # Send f_ac(1-3)
-        if (msg.f_ac(1)<70 and self.config.has_option(section_id, 'AC1_frequency_idx')):
+        if (30<msg.f_ac(1)<70 and self.config.has_option(section_id, 'AC1_frequency_idx')):
             data_idx_array.update ({
                 self.config.get(section_id, 'AC1_frequency_idx'): msg.f_ac(1),
             })
         else: self.logger.debug('AC1 frequency out of range, or not defined: '+str(msg.f_ac(1))+' Hertz')
-        if (msg.f_ac(2)<70 and self.config.has_option(section_id, 'AC2_frequency_idx')):
+        if (30<msg.f_ac(2)<70 and self.config.has_option(section_id, 'AC2_frequency_idx')):
             data_idx_array.update ({
                 self.config.get(section_id, 'AC2_frequency_idx'): msg.f_ac(2),
             })
         else: self.logger.debug('AC2 frequency out of range, or not defined: '+str(msg.f_ac(2))+' Hertz')
-        if (msg.f_ac(3)<70 and self.config.has_option(section_id, 'AC3_frequency_idx')):
+        if (30<msg.f_ac(3)<70 and self.config.has_option(section_id, 'AC3_frequency_idx')):
             data_idx_array.update ({
                 self.config.get(section_id, 'AC3_frequency_idx'): msg.f_ac(3),
             })
