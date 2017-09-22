@@ -67,13 +67,13 @@ Omnikol-PV-Logger by t3kpunk (https://github.com/t3kpunk/Omniksol-PV-Logger).
 * Change the settings in config.cfg
 * Test your settings with `python LiveStats.py`, when successful you should see
 data from your inverter
-* Run the script with `python OmnikExport.py` or better set a scheduled task or 
+* Run the script with `python InverterExport.py` or better set a scheduled task or 
 cronjob.
 
 ### Example cronjob
 With these options this will execute the script every minute.
 
-`* * * * * /usr/bin/python /home/username/Omnik-Data-Logger/OmnikExport.py`
+`* * * * * /usr/bin/python /home/username/Inverter-Data-Logger/InverterExport.py`
 
 ### Why copy config-org.cfg, can't I edit it directly?
 Yes you can edit config-org.cfg directly. However if you want to update the 
@@ -83,6 +83,6 @@ config.cfg, you can preserve your settings when upgrading.
 ## Development
 To help with development when no sun is present a small simulator script can be
 found in the folder Development. This script works by reading values from to
-database used by de MysqlOutput, but with the time shifted 6 hours back. To use
+database used by the MysqlOutput, but with the time shifted 6 hours back. To use
 the simulator, you should use the MysqlOutput to fill the database and configure
 database settings in de sim-config.cfg file.
