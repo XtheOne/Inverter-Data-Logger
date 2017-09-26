@@ -65,61 +65,92 @@ class OmnikExport(object):
             __import__(plugin_name)
 
         # Connect to logger
-        ip = self.config.get('logger', 'ip')
-        port = self.config.get('logger', 'port')
-        timeout = self.config.getfloat('logger', 'timeout')
+        if not self.config.has_option('logger', 'gateways'):
+            self.logger.error('no gateways defined in configuration file, exiting.')
+            return []
 
-        for res in socket.getaddrinfo(ip, port, socket.AF_INET,
-                                      socket.SOCK_STREAM):
-            family, socktype, proto, canonname, sockadress = res
-            try:
-                self.logger.info('connecting to {0} port {1}'.format(ip, port))
-                logger_socket = socket.socket(family, socktype, proto)
-                logger_socket.settimeout(timeout)
-                logger_socket.connect(sockadress)
-            except socket.error as msg:
-                self.logger.error('Could not open socket')
-                self.logger.error(msg)
-                sys.exit(1)
+        if(self.config.get('logger', 'gateways') == 'auto'):
+            # get loggers
+            gateway_list = InverterLib.getLoggers().split(',')
+            if (len(gateway_list) < 2):
+                self.logger.error('No loggers found: {0}, exiting.'.format(gateway_list))
+                return []
+            self.logger.info('Loggers found  on the network: {0}.'.format(gateway_list))
+        else:
+            gateway_list = self.config.get('logger', 'gateways').split(',')
+            if (len(gateway_list) % 2):
+                self.logger.error('incorrect number of values in configuration file for gateways: {0}, exiting.'.format(gateway_list))
+                return []
 
-        wifi_serial = self.config.getint('logger', 'wifi_sn')
-        data = InverterLib.generate_string(int(wifi_serial))
-        logger_socket.sendall(data)
+        for i in range(0, len(gateway_list), 2):
+            ip = gateway_list[i]
+            sn = gateway_list[i+1]
+    
+            self.logger.info('Connecting to logger with IP: {0} and SN {1}'.format(ip, sn))
+    
+            port = self.config.get('logger', 'port')
+            timeout = self.config.getfloat('logger', 'timeout')
+    
+            next = False
+            for res in socket.getaddrinfo(ip, port, socket.AF_INET,
+                                           socket.SOCK_STREAM):
+                 family, socktype, proto, canonname, sockadress = res
+                 try:
+                     self.logger.info('connecting to {0} port {1}'.format(ip, port))
+                     logger_socket = socket.socket(family, socktype, proto)
+                     logger_socket.settimeout(timeout)
+                     logger_socket.connect(sockadress)
+                 except socket.error as msg:
+                     self.logger.error('Could not open socket')
+                     self.logger.error(msg)
+                     self.logger.error('Error connecting to logger with IP: {0} and SN {1}, trying next logger.'.format(ip, sn))
+                     next = True
+                     break
+            if (next):
+                continue
 
-        #dump raw data to log
-        self.logger.debug('RAW sent Packet (len={0}): '.format(len(data))+':'.join(x.encode('hex') for x in data))
-
-        okflag = False
-        while (not okflag):
-
-            data = logger_socket.recv(1500)
+            data = InverterLib.generate_string(int(sn))
+            logger_socket.sendall(data)
     
             #dump raw data to log
-            self.logger.debug('RAW received Packet (len={0}): '.format(len(data))+':'.join(x.encode('hex') for x in data))
+            self.logger.debug('RAW sent Packet (len={0}): '.format(len(data))+':'.join(x.encode('hex') for x in data))
     
-            msg = InverterMsg.InverterMsg(data)
+            okflag = False
+            while (not okflag):
     
-            if (msg.ok)[:9] == 'DATA SEND':
-                self.logger.debug("Exit Status: {0}".format(msg.ok))
-                logger_socket.close()
-                okflag = True
-                continue
-
-            if (msg.ok)[:11] == 'NO INVERTER':
-                self.logger.debug("Inverter(s) are in sleep mode: {0} received".format(msg.ok))
-                logger_socket.close()
-                okflag = True
-                continue
-
-            self.logger.info("Inverter ID: {0}".format(msg.id))
-            self.logger.info("Inverter main firmware version: {0}".format(msg.main_fwver))
-            self.logger.info("Inverter slave firmware version: {0}".format(msg.slave_fwver))
-            self.logger.info("RUN State: {0}".format(msg.run_state))
+                try:
+                    data = logger_socket.recv(1024)
+                except socket.timeout, e:
+                    self.logger.error('Timeout connecting to logger with IP: {0} and SN {1}, trying next logger.'.format(ip, sn))
+                    okflag = True
+                    continue
+        
+                #dump raw data to log
+                self.logger.debug('RAW received Packet (len={0}): '.format(len(data))+':'.join(x.encode('hex') for x in data))
+        
+                msg = InverterMsg.InverterMsg(data)
+        
+                if (msg.ok)[:9] == 'DATA SEND':
+                    self.logger.debug("Exit Status: {0}".format(msg.ok))
+                    logger_socket.close()
+                    okflag = True
+                    continue
     
-            for plugin in Plugin.plugins:
-                self.logger.debug('Run plugin' + plugin.__class__.__name__)
-                plugin.process_message(msg)
-
+                if (msg.ok)[:11] == 'NO INVERTER':
+                    self.logger.debug("Inverter(s) are in sleep mode: {0} received".format(msg.ok))
+                    logger_socket.close()
+                    okflag = True
+                    continue
+    
+                self.logger.info("Inverter ID: {0}".format(msg.id))
+                self.logger.info("Inverter main firmware version: {0}".format(msg.main_fwver))
+                self.logger.info("Inverter slave firmware version: {0}".format(msg.slave_fwver))
+                self.logger.info("RUN State: {0}".format(msg.run_state))
+        
+                for plugin in Plugin.plugins:
+                    self.logger.debug('Run plugin' + plugin.__class__.__name__)
+                    plugin.process_message(msg)
+    
     def build_logger(self, config):
         # Build logger
         """

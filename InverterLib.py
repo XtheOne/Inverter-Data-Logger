@@ -1,4 +1,5 @@
 import socket
+import struct
 import os
 
 def getNetworkIp():
@@ -49,3 +50,37 @@ def expand_path(path):
         return path
     else:
         return os.path.dirname(os.path.abspath(__file__)) + "/" + path
+
+def getLoggers():
+    # Create the datagram socket
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    sock.bind((getNetworkIp(), 48899))
+    # Set a timeout so the socket does not block indefinitely when trying to receive data.
+    sock.settimeout(3)
+    # Set the time-to-live for messages to 1 so they do not go past the local network segment.
+    ttl = struct.pack('b', 1)
+    sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, ttl)
+    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+
+    gateways = ''
+    try:
+        # Send data to the broadcast address
+        sent = sock.sendto('WIFIKIT-214028-READ', ('<broadcast>', 48899))
+        # Look for responses from all recipients
+        while True:
+            try:
+                data, server = sock.recvfrom(1024)
+            except socket.timeout:
+                break
+            else:
+                if (data == 'WIFIKIT-214028-READ'): continue #skip sent data
+                a = data.split(',')
+                wifi_ip, wifi_mac, wifi_sn = a[0],a[1],a[2]
+                if (len(gateways)>1):
+                    gateways = gateways+','
+                gateways = gateways+wifi_ip+','+wifi_sn
+    
+    finally:
+        sock.close()
+        return gateways
