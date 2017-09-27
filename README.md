@@ -72,8 +72,38 @@ cronjob.
 
 ### Example cronjob
 With these options this will execute the script every minute.
+crontab -e
+Add row: * * * * * /usr/bin/python /home/username/Inverter-Data-Logger/InverterExport.py
 
-`* * * * * /usr/bin/python /home/username/Inverter-Data-Logger/InverterExport.py`
+* For Windows
+* Start (or My Computer) -> Control Panel -> Scheduled Tasks -> Add Scheduled Task ... etc 
+or
+* Start -> All Programs -> Administrative Tools -> Task Scheduler -> Action -> New Task -> 
+    General (tab) -> 
+       Name: InverterExport
+       Description: Attempt to fire up the solar inverter exporter.
+       Select 'Run whether user is logged on or not' and 'Do not store password.'
+       Select 'Run with highest privileges.'
+    Triggers (tab) -> New -> 
+       Begin the task: 'On a schedule'
+       Settings: 'Daily' '00:00:00 AM'. Recur every: 1 days.
+       Repeat task every: '1 minutes' for a duration of: '1 day' (or 'Indefinitely')
+       'Enabled'
+       -> OK.
+    Actions (tab) -> New -> 
+       Action: 'Start a program' 
+       Program/script: C:\Inverter-Data-Logger\InverterExport.py
+       -> OK.
+    Conditions (tab) -> 
+       choose your own options.
+    Settings (tab) -> 
+       'Allow task to be run on demand'
+ 'Stop the task if it runs longer than: '2 days'
+       If the task is already running, then the following rule applies: 'Do not start a new instance'
+       -> OK
+
+NOTE: If you need to kill the process manually: open Task Manager > Processes > Tick 'Show Processes from all users' > right click 'python.exe' > select 'End Process'.
+
 
 ### Why copy config-org.cfg, can't I edit it directly?
 Yes you can edit config-org.cfg directly. However if you want to update the 

@@ -51,10 +51,10 @@ ttl = struct.pack('b', 1)
 sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, ttl)
 sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-
+SendData = "WIFIKIT-214028-READ" # Lotto/TM = "AT+YZAPP=214028,READ"
 try:
     # Send data to the broadcast address
-    sent = sock.sendto('WIFIKIT-214028-READ', ('<broadcast>', 48899))
+    sent = sock.sendto(SendData, ('<broadcast>', 48899))
     # Look for responses from all recipients
     while True:
         try:
@@ -62,7 +62,7 @@ try:
         except socket.timeout:
             break
         else:
-            if (data == 'WIFIKIT-214028-READ'): continue #skip sent data
+            if (data == SendData): continue #skip sent data
             a = data.split(',')
             wifi_ip, wifi_mac, wifi_sn = a[0],a[1],a[2]
             print >>sys.stdout, 'WiFi kit logger found, IP = %s and S/N = %s' % (wifi_ip, wifi_sn)

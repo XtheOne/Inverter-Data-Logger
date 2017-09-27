@@ -23,8 +23,8 @@ def generate_string(serial_no):
     Returns:
         str: Information request string for inverter
     """
-    #response = '\x68\x02\x40\x30' # Old
-    response = '\x68\x02\x41\xb1' #from SolarMan / new Omnik
+    #response = '\x68\x02\x40\x30' # from old omnik app
+    response = '\x68\x02\x41\xb1' #from SolarMan / new Omnik app
     res_ck = sum([ord(c) for c in response])
     footer = '\x01\x00' # x02\x00 geeft ERR= -1
     foo_ck = sum([ord(c) for c in footer])
@@ -62,11 +62,12 @@ def getLoggers():
     sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, ttl)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+    SendData = "WIFIKIT-214028-READ" # Lotto/TM = "AT+YZAPP=214028,READ"
 
     gateways = ''
     try:
         # Send data to the broadcast address
-        sent = sock.sendto('WIFIKIT-214028-READ', ('<broadcast>', 48899))
+        sent = sock.sendto(SendData, ('<broadcast>', 48899))
         # Look for responses from all recipients
         while True:
             try:
@@ -74,7 +75,7 @@ def getLoggers():
             except socket.timeout:
                 break
             else:
-                if (data == 'WIFIKIT-214028-READ'): continue #skip sent data
+                if (data == SendData): continue #skip sent data
                 a = data.split(',')
                 wifi_ip, wifi_mac, wifi_sn = a[0],a[1],a[2]
                 if (len(gateways)>1):

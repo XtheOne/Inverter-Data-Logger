@@ -18,8 +18,6 @@ The WiFi-Kit will respond with a UDP datagram containing it's IP address, Base M
 HEX: 31 39 32 2e 31 36 38 2e 32 32 34 2e 33 34 2c 41 43 43 46 32 33 31 34 44 44 31 30 2c 31 36 30 31 32 39 39 36 38 38
 ASCII: 192.168.224.34,ACCF2314DD10,1601299688
 
-#command header = Command byte, reply id/version, ???, ???
-
 These response data frames are the same as sent to www.solarmandata.com:10004 and/or a specified server/port in the logger server config page.
 Only the last OK frame is different, The logger firmware version is sent
 
@@ -27,20 +25,26 @@ Only the last OK frame is different, The logger firmware version is sent
 Connect to TCP port 8899 on the WiFi-Kit IP.
 
 Then sent the following DATA (16 bytes) to trigger the logger.
-HEX: 68 02 41 b1  (command header)
+HEX: 68           (V4 headCode)
+HEX: 02           (dataFieldLength)
+HEX: 41 b1        (contrlCode)
 HEX: e8 e4 71 5f  (reversed hex notation of the logger s/n)
 HEX: e8 e4 71 5f  (reversed hex notation of the logger s/n)
-HEX: 01 00        (command end?)
+HEX: 01 00        (data)
 HEX: 2d           (checksum)
-HEX: 16           (Data end flag)
+HEX: 16           (V4 endCode)
 
 
 This response frame is repeated for every connected inverter. (also to a server)
-Response (183 bytes): (143 bytes from older logger)
-HEX: 68 a9 41 b0  (command header)
+Response (183 bytes):
+HEX: 68           (headCode)
+HEX: a9           (dataFieldLength)
+HEX: 41 b0        (contrlCode)
 HEX: e8 e4 71 5f  (reversed hex notation of the logger s/n)
 HEX: e8 e4 71 5f  (reversed hex notation of the logger s/n)
-HEX: 81 02 01     (command end)
+HEX: 81
+HEX: 02
+HEX: 01
 HEX: 4e 4c 42 4e 34 30 32 30 31 34 36 4a 33 30 30 32  (Inverter Serial)
 HEX: 01 31  Temp
 HEX: 0a 94  PV_V1
@@ -64,11 +68,15 @@ HEX: 00 00  AC_P3
 HEX: 00 2b  e_today
 HEX: 00 00 70 9a  e_total
 HEX: 00 00 15 dd  h_total
-HEX: 00 01  RUN state (79)
-HEX: 00 00  PV_?1 (81)
-HEX: 00 00  PV_?2 (83)
-HEX: 00 00  PV_?3 (85)
-HEX: 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ??? (87)
+HEX: 00 01  mode (79)
+HEX: 00 00  GVFaultValue (81)
+HEX: 00 00  GFFaultValue (83)
+HEX: 00 00  GZFaultValue (85)
+HEX: 00 00  TmpFaultValue (87)
+HEX: 00 00  PVFaultValue (89)
+HEX: 00 00  GFCIFaultValue (91)
+HEX: 00 00 00 00  errorMsg (93)
+HEX: 00 00 00 00  ??? (97)
 HEX: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  Inverter main firmware version (101)
 HEX: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  Inverter slave firmware version (117)
 HEX: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ??? (133) (not in older loggers)
@@ -78,9 +86,58 @@ HEX: f4  (checksum)
 HEX: 16  (Data end flag)
 
 
+Response (143 bytes):
+HEX: 68           (headCode)
+HEX: 81           (dataFieldLength)
+HEX: 51 b0        (contrlCode)
+HEX: de 3d 10 1e  (reversed hex notation of the logger s/n)
+HEX: de 3d 10 1e  (reversed hex notation of the logger s/n)
+HEX: 81
+HEX: 02
+HEX: 01
+HEX: 4e 4c 44 4e 32 30 32 30 31 34 36 36 32 31 35 39  (Inverter Serial)
+HEX: 01 35  Temp    
+HEX: 0a 5b  PV_V1  
+HEX: 00 00  PV_V2  
+HEX: ff ff  PV_V3  
+HEX: 00 05  PV_I1  
+HEX: 00 b4  PV_I2  
+HEX: ff ff  PV_I3  
+HEX: 00 05  AC_I1  
+HEX: ff ff  AC_I2  
+HEX: ff ff  AC_I3  
+HEX: 08 ff  AC_V1  
+HEX: ff ff  AC_V2  
+HEX: ff ff  AC_V3  
+HEX: 13 8f  AC_F1  
+HEX: 00 80  AC_P1  
+HEX: ff ff  AC_F2  
+HEX: ff ff  AC_P2  
+HEX: ff ff  AC_F3  
+HEX: ff ff  AC_P3  
+HEX: 00 77  e_today
+HEX: 00 01 03 7b  e_total
+HEX: 00 00 2f 6d  h_total
+HEX: 00 01  mode (79)          
+HEX: 00 00  GVFaultValue (81)   
+HEX: 00 00  GFFaultValue (83)   
+HEX: ff ff  GZFaultValue (85)   
+HEX: 00 00  TmpFaultValue (87)  
+HEX: 00 00  PVFaultValue (89)   
+HEX: 00 00  GFCIFaultValue (91) 
+HEX: 00 00 00 00  errorMsg
+HEX: 00 00 00 00  ??? (97)
+HEX: 4e 4c 31 2d 56 31 2e 30 2d 30 30 36 37 2d 34 00 00 00 00 00  NL1-V1.0-0067-4
+HEX: 56 31 2e 36 2d 30 30 31 38 00 00 00 00 00 00 00 00 00 00 00  V1.6-0018
+HEX: 42  (checksum)     
+HEX: 16  (Data end flag)
+
+
 This response frame is send after all data is sent.
 Response (99 bytes):
-HEX: 68 11 41 f0  (command header)
+HEX: 68           (headCode)
+HEX: 11           (dataFieldLength)
+HEX: 41 f0        (contrlCode)
 HEX: e8 e4 71 5f  (reversed hex notation of the logger s/n)
 HEX: e8 e4 71 5f  (reversed hex notation of the logger s/n)
 HEX: 44 41 54 41 20 53 45 4e 44 20 49 53 20 4f 4b 0d 0a  DATA SEND IS OK<cr>
@@ -121,3 +178,45 @@ com\yingzhen\commontcp\util\DataParse.java
 com\yingzhen\offline\service\SendTcpDataService.java
 
 Look for fault state.
+
+
+
+
+
+
+
+Response length = 183 () bytes: Frame version V4 (First byte must be hex:68)
+
+Length = (Data) x + (header) 12 + (checksum) 1 + (endCode) 1
+
+
+V4        85
+Lotto     62
+Exception  3
+Result    17
+
+
+
+V4 frame layout
+HEX: 68           (V4 headCode)
+HEX: 02           (dataFieldLength)
+HEX: 41 b1        (contrlCode)
+HEX: e8 e4 71 5f  (targIp)
+HEX: e8 e4 71 5f  (sourceIp)
+HEX: 01 00        (data field)
+HEX: 2d           (checksum)
+HEX: 16           (V4 endCode)
+
+V5 frame layout
+HEX: a5           (V5 headCode)
+HEX: 02 00        (dataFieldLength)
+HEX: 41 b1        (contrlCode)
+HEX: e8 e4        (serialNumber)
+HEX: e8 e4 71 5f  (sn)
+HEX: 01 00        (data fields)
+HEX: 2d           (checksum)
+HEX: 15           (V4 endCode)
+
+
+
+
