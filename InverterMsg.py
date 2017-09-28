@@ -20,7 +20,18 @@ class InverterMsg(object):
             str: String in the message from start to end
         """
         return self.raw_msg[begin:end]
+#
+    def __get_int(self, begin):
+        """Extract byte value from message.
 
+        Args:
+            begin (int): starting byte index of string
+
+        Returns:
+            int: value at offset
+        """
+        return int(self.raw_msg[begin:begin+1].encode('hex'), 16)
+#
     def __get_short(self, begin, divider=10):
         """Extract short from message.
 
@@ -58,9 +69,14 @@ class InverterMsg(object):
             struct.unpack('!I', self.raw_msg[begin:begin + 4])[0]) / divider
 
     @property
-    def ok(self):
-        """received OK msg."""
-        return self.__get_string(12, 31).split('\r\n')[0]
+    def len(self):
+        """received data len msg."""
+        return self.__get_int(1)
+
+    @property
+    def msg(self):
+        """received status msg."""
+        return self.__get_string(12, self.len+12)
 
     @property
     def id(self):
@@ -100,11 +116,13 @@ class InverterMsg(object):
     @property
     def main_fwver(self):
         """Inverter main firmware version."""
+        if (self.__get_int(101) == 0): return ""
         return self.__get_string(101, 116)
 
     @property
     def slave_fwver(self):
         """Inverter slave firmware version."""
+        if (self.__get_int(121) == 0): return ""
         return self.__get_string(121, 130)
 
     def v_pv(self, i=1):

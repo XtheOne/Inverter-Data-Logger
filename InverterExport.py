@@ -129,15 +129,18 @@ class OmnikExport(object):
                 self.logger.debug('RAW received Packet (len={0}): '.format(len(data))+':'.join(x.encode('hex') for x in data))
         
                 msg = InverterMsg.InverterMsg(data)
-        
-                if (msg.ok)[:9] == 'DATA SEND':
-                    self.logger.debug("Exit Status: {0}".format(msg.ok))
+
+                #log DATA length
+                self.logger.debug('DATA len={0}: '.format(msg.len))
+
+                if (msg.msg)[:9] == 'DATA SEND':
+                    self.logger.debug("Exit Status: {0}".format(msg.msg))
                     logger_socket.close()
                     okflag = True
                     continue
     
-                if (msg.ok)[:11] == 'NO INVERTER':
-                    self.logger.debug("Inverter(s) are in sleep mode: {0} received".format(msg.ok))
+                if (msg.msg)[:11] == 'NO INVERTER':
+                    self.logger.debug("Inverter(s) are in sleep mode: {0} received".format(msg.msg))
                     logger_socket.close()
                     okflag = True
                     continue
