@@ -24,7 +24,7 @@ def get_inverter_sn(wifi_serial, wifi_ip):
         data = logger_socket.recv(1500)
         msg = InverterMsg.InverterMsg(data)
 
-        if (msg.ok)[:9] == 'DATA SEND':
+        if (msg.msg)[:9] == 'DATA SEND':
             logger_socket.close()
             okflag = True
             continue
@@ -79,7 +79,7 @@ try:
                 data = logger_socket.recv(1500)
                 msg = InverterMsg.InverterMsg(data)
         
-                if (msg.ok)[:9] == 'DATA SEND':
+                if (msg.msg)[:9] == 'DATA SEND':
                     logger_socket.close()
                     okflag = True
                     continue
