@@ -1,5 +1,5 @@
 import struct  # Converting bytes to numbers
-
+import re
 
 class InverterMsg(object):
     """Decode the response message from an omniksol inverter."""
@@ -117,13 +117,13 @@ class InverterMsg(object):
     def main_fwver(self):
         """Inverter main firmware version."""
         if (self.__get_int(101) == 0): return ""
-        return self.__get_string(101, 116)
+        return re.sub('[^\x28-\x80]', '', self.__get_string(101, 116))
 
     @property
     def slave_fwver(self):
         """Inverter slave firmware version."""
         if (self.__get_int(121) == 0): return ""
-        return self.__get_string(121, 130)
+        return re.sub('[^\x28-\x80]', '', self.__get_string(121, 130))
 
     def v_pv(self, i=1):
         """Voltage of PV input channel.
