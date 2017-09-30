@@ -114,16 +114,51 @@ class InverterMsg(object):
         return int(self.__get_short(79, 1))
 
     @property
+    def GVFaultValue(self):
+        """Grid voltage fault value in V"""
+        return self.__get_short(81, 10)  # Divide by 10
+
+    @property
+    def GVFaultValue(self):
+        """Grid frequency fault value in Hz"""
+        return self.__get_short(83, 100)  # Divide by 100
+
+    @property
+    def GZFaultValue(self):
+        """Grid impedance fault value in Ohm"""
+        return self.__get_short(85, 1000)  # Divide by 1000
+
+    @property
+    def TmpFaultValue(self):
+        """Temperature fault value in oC"""
+        return self.__get_short(87, 10)  # Divide by 10
+
+    @property
+    def PVFaultValue(self):
+        """PV voltage fault value in V"""
+        return self.__get_short(89, 10)  # Divide by 10
+
+    @property
+    def GFCIFaultValue(self):
+        """GFCI current fault value in A"""
+        return self.__get_short(91, 1000)  # Divide by 1000
+
+    @property
+    def errorMsg(self):
+        """errorMsg binary index value"""
+        return int(self.__get_long(93))
+
+    @property
     def main_fwver(self):
         """Inverter main firmware version."""
         if (self.__get_int(101) == 0): return ""
-        return re.sub('[^\x28-\x80]', '', self.__get_string(101, 116))
+        return re.sub('[^\x28-\x80]', '', self.__get_string(101, 120))
 
     @property
     def slave_fwver(self):
         """Inverter slave firmware version."""
         if (self.__get_int(121) == 0): return ""
-        return re.sub('[^\x28-\x80]', '', self.__get_string(121, 130))
+        return re.sub('[^\x28-\x80]', '', self.__get_string(121, 140))
 
     def v_pv(self, i=1):
         """Voltage of PV input channel.

@@ -12,9 +12,9 @@ class ConsoleOutput(PluginLoader.Plugin):
         """
         print "Inverter ID: {0}".format(msg.id)
 
-        print "E Today: {0:>5}   Total: {1:<5}".format(msg.e_today, ((((msg.e_today*10)-(int(msg.e_today*10)))/10)+msg.e_total))
-        print "H Total: {0:>5}   Temp:  {1:<5}"\
-            .format(msg.h_total, msg.temperature)
+        print "E Today : {0:>5}   Total: {1:<5}".format(msg.e_today, ((((msg.e_today*10)-(int(msg.e_today*10)))/10)+msg.e_total))
+        print "H Total : {0:>5}   Temp : {1:<5}".format(msg.h_total, msg.temperature)
+        print "errorMsg: {0:>5}".format(msg.errorMsg)
 
         print "PV1   V: {0:>5}   I: {1:>4}".format(msg.v_pv(1), msg.i_pv(1))
         print "PV2   V: {0:>5}   I: {1:>4}".format(msg.v_pv(2), msg.i_pv(2))
