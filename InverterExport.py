@@ -1,5 +1,5 @@
 #!/usr/bin/python
-"""OmnikExport program.
+"""InverterExport program.
 
 Get data from a Wi-Fi kit logger and save/send the data to the defined plugin(s)
 """
@@ -14,7 +14,7 @@ from PluginLoader import Plugin
 import InverterMsg  # Import the Msg handler
 import InverterLib  # Import the library
 
-class OmnikExport(object):
+class InverterExport(object):
     """
     Get data from the inverter(s) and store the data in a configured output
     format/location.
@@ -182,19 +182,19 @@ class OmnikExport(object):
                     'formatter': 'f'},
             },
             'loggers': {
-                'OmnikLogger': {
+                'InverterLogger': {
                     'handlers': config.get('log', 'type').split(','),
                     'level': log_levels[config.get('log', 'level')]
                 }
             }
         }
         logging.config.dictConfig(log_dict)
-        self.logger = logging.getLogger('OmnikLogger')
+        self.logger = logging.getLogger('InverterLogger')
 
     def override_config(self, section, option, value):
         """Override config settings"""
         self.config.set(section, option, value)
 
 if __name__ == "__main__":
-    omnik_exporter = OmnikExport('config.cfg')
-    omnik_exporter.run()
+    inverter_exporter = InverterExport('config.cfg')
+    inverter_exporter.run()

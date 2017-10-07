@@ -3,7 +3,7 @@ from datetime import datetime
 
 
 class CSVOutput(PluginLoader.Plugin):
-    """Outputs the data from the Omnik inverter to stdout in csv format"""
+    """Outputs the data from the inverter logger to stdout in csv format"""
 
     def process_message(self, msg):
         """Output the information from the inverter to stdout in csv format.

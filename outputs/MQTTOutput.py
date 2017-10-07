@@ -3,10 +3,10 @@ from datetime import datetime
 import paho.mqtt.client as mqtt
 
 class MWTTOutput(PluginLoader.Plugin):
-        """Outputs the data from the Omnik inverter to an MQTT server """
+        """Outputs the data from the inverter logger to an MQTT server """
 
         def process_message(self, msg):
-                client = mqtt.Client("Omnik Solar Inverter")
+                client = mqtt.Client("Solar Inverter")
                 client.username_pw_set( self.config.get('mqtt', 'user'),
                                         self.config.get('mqtt', 'pass'))
                 client.connect( self.config.get('mqtt', 'host'),

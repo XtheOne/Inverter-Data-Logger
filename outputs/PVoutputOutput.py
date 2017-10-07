@@ -5,7 +5,7 @@ import urllib2
 
 
 class PVoutputOutput(PluginLoader.Plugin):
-    """Sends the data from the Omnik inverter to PVoutput.org"""
+    """Sends the data from the inverter logger to PVoutput.org"""
 
     def process_message(self, msg):
         """Send the information from the inverter to PVoutput.org.

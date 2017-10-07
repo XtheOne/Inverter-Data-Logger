@@ -1,17 +1,17 @@
 #!/usr/bin/python
-"""OmnikExport LiveStats
+"""InverterExport LiveStats
 
-Get data from the omniksol inverter and output to console. This is a small
+Get data from the inverter logger and output to console. This is a small
 utility program that just changes the config to output anything to console.
 """
-import OmnikExport
+import InverterExport
 
 
 if __name__ == "__main__":
-    omnik_exporter = OmnikExport.OmnikExport('config.cfg')
+    inverter_exporter = InverterExport.InverterExport('config.cfg')
 
-    omnik_exporter.override_config('general', 'enabled_plugins',
+    inverter_exporter.override_config('general', 'enabled_plugins',
                                    'ConsoleOutput')
-    omnik_exporter.override_config('log', 'type', 'console')
-    omnik_exporter.override_config('log', 'level', 'debug')
-    omnik_exporter.run()
+    inverter_exporter.override_config('log', 'type', 'console')
+    inverter_exporter.override_config('log', 'level', 'debug')
+    inverter_exporter.run()

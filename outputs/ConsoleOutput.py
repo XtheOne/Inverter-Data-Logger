@@ -2,7 +2,7 @@ import PluginLoader
 
 
 class ConsoleOutput(PluginLoader.Plugin):
-    """Outputs the data from the Omnik inverter to stdout"""
+    """Outputs the data from the inverter logger to stdout"""
 
     def process_message(self, msg):
         """Output the information from the inverter to stdout.

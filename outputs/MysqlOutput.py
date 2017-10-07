@@ -3,7 +3,7 @@ import datetime
 
 
 class MysqlOutput(PluginLoader.Plugin):
-    """Stores the data from the Omnik inverter into a mysql database"""
+    """Stores the data from the inverter logger into a mysql database"""
 
     def process_message(self, msg):
         """Store the information from the inverter in a mysql database.

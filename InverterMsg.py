@@ -2,7 +2,7 @@ import struct  # Converting bytes to numbers
 import re
 
 class InverterMsg(object):
-    """Decode the response message from an omniksol inverter."""
+    """Decode the response message from an inverter logger."""
     raw_msg = ""
 
     def __init__(self, msg, offset=0):
