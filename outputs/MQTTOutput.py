@@ -16,7 +16,10 @@ class MWTTOutput(PluginLoader.Plugin):
                 client.publish("power/solar/e_today", msg.e_today)
                 client.publish("power/solar/h_total", msg.h_total)
                 client.publish("power/solar/power", msg.power)
-                client.publish("power/solar/temp", msg.temperature)
+                # sometimes the inverter gives 514,7 as temperature, don't send temp then!
+                if (msg.temperature<300 and self.config.getboolean('general', 'use_temperature')):
+                    client.publish("power/solar/temp", msg.temperature)
+                else: self.logger.error('temperature out of range: '+str(msg.temperature))
 
                 for x in [1,2,3]:
                         client.publish("power/solar/v_pv" + str(x), msg.v_pv(x))

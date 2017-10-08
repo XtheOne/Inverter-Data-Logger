@@ -48,7 +48,7 @@ class PVoutputOutput(PluginLoader.Plugin):
                 'v2': msg.p_ac(1),
             }
             # sometimes the inverter gives 514,7 as temperature, don't send temp then!
-            if (msg.temperature<300 and self.config.getboolean('inverter', 'use_temperature')):
+            if (msg.temperature<300 and self.config.getboolean('general', 'use_temperature')):
                 get_data.update ({
                     'v5': msg.temperature,
                 })

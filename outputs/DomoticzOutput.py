@@ -18,6 +18,8 @@ class DomoticzOutput(PluginLoader.Plugin):
             self.logger.error('no section in configuration file for inverter with ID: {0}, skipping.'.format(msg.id))
             return []
 
+        mv = int(self.config.get('general', 'min_voltage'))
+        
         host = self.config.get(section_id, 'host')
         port = self.config.get(section_id, 'port')
         path = self.config.get(section_id, 'path')
@@ -98,17 +100,17 @@ class DomoticzOutput(PluginLoader.Plugin):
         else: self.logger.debug('PV1/2/3 current not defined: '+str(msg.i_pv(1))+'/'+str(msg.i_pv(2))+'/'+str(msg.i_pv(3))+' Ampere')
         # Send v_pv(1-3)
         # don't send PV voltages when 0.
-        if (msg.v_pv(1)>0 and self.config.has_option(section_id, 'PV1_voltage_idx')):
+        if (msg.v_pv(1)>mv and self.config.has_option(section_id, 'PV1_voltage_idx')):
             data_idx_array.update ({
                 self.config.get(section_id, 'PV1_voltage_idx'): msg.v_pv(1),
             })
         else: self.logger.debug('PV1 voltage out of range, or not defined: '+str(msg.v_pv(1))+' Volts')
-        if (msg.v_pv(2)>0 and self.config.has_option(section_id, 'PV2_voltage_idx')):
+        if (msg.v_pv(2)>mv and self.config.has_option(section_id, 'PV2_voltage_idx')):
             data_idx_array.update ({
                 self.config.get(section_id, 'PV2_voltage_idx'): msg.v_pv(2),
             })
         else: self.logger.debug('PV2 voltage out of range, or not defined: '+str(msg.v_pv(2))+' Volts')
-        if (msg.v_pv(3)>0 and self.config.has_option(section_id, 'PV3_voltage_idx')):
+        if (msg.v_pv(3)>mv and self.config.has_option(section_id, 'PV3_voltage_idx')):
             data_idx_array.update ({
                 self.config.get(section_id, 'PV3_voltage_idx'): msg.v_pv(3),
             })
@@ -140,17 +142,17 @@ class DomoticzOutput(PluginLoader.Plugin):
             })
         else: self.logger.debug('AC1/2/3 current not defined: '+str(msg.i_ac(1))+'/'+str(msg.i_ac(2))+'/'+str(msg.i_ac(3))+' Ampere')
         # Send v_ac(1-3)
-        if (msg.v_ac(1)>0 and self.config.has_option(section_id, 'AC1_voltage_idx')): # drops to 0V when in sleep mode
+        if (msg.v_ac(1)>mv and self.config.has_option(section_id, 'AC1_voltage_idx')): # drops to 0V when in sleep mode
             data_idx_array.update ({
                 self.config.get(section_id, 'AC1_voltage_idx'): msg.v_ac(1),
             })
         else: self.logger.debug('AC1 voltage out of range, or not defined: '+str(msg.v_ac(1))+' Volt')
-        if (msg.v_ac(2)>0 and self.config.has_option(section_id, 'AC2_voltage_idx')): # drops to 0V when in sleep mode
+        if (msg.v_ac(2)>mv and self.config.has_option(section_id, 'AC2_voltage_idx')): # drops to 0V when in sleep mode
             data_idx_array.update ({
                 self.config.get(section_id, 'AC2_voltage_idx'): msg.v_ac(2),
             })
         else: self.logger.debug('AC2 voltage out of range, or not defined: '+str(msg.v_ac(2))+' Volt')
-        if (msg.v_ac(3)>0 and self.config.has_option(section_id, 'AC3_voltage_idx')): # drops to 0V when in sleep mode
+        if (msg.v_ac(3)>mv and self.config.has_option(section_id, 'AC3_voltage_idx')): # drops to 0V when in sleep mode
             data_idx_array.update ({
                 self.config.get(section_id, 'AC3_voltage_idx'): msg.v_ac(3),
             })
