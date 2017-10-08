@@ -18,7 +18,7 @@ class DomoticzOutput(PluginLoader.Plugin):
             self.logger.error('no section in configuration file for inverter with ID: {0}, skipping.'.format(msg.id))
             return []
 
-        mv = int(self.config.get('general', 'min_voltage'))
+        mv = int(self.config.get('general', 'min_voltage'))-1
         
         host = self.config.get(section_id, 'host')
         port = self.config.get(section_id, 'port')
