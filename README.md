@@ -28,7 +28,7 @@ Omnikol-PV-Logger by t3kpunk (https://github.com/t3kpunk/Omniksol-PV-Logger).
 * Install Python
 * Git clone the source with `git clone https://github.com/XtheOne/Inverter-Data-Logger.git`
 * Copy the config-org.cfg to config.cfg
-* Change the settings in config.cfg (See '[Configuration](#installation-and-setup)')
+* Change the settings in config.cfg (See '[Configuration](#configuration)')
 * Test your settings with `python LiveStats.py`, when successful you should see data from your inverter.
 * Run the script with `python InverterExport.py` or better set a scheduled task or cronjob. (See '[Setting cronjob](#setting-cronjob)')
 
