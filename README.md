@@ -1,14 +1,13 @@
-<style>h1{margin:0;}h2{margin:0;}h3{margin:0;}h4{margin:0;}</style>
-<h1></a>Inverter Data Logger</h1><hr>
+<h1></a>Inverter Data Logger</h1>
 <p>Inverter Data Logger is a small script for uploading data from a Omnik, Hosola, Goodwe, Solax, Ginlong, Samil, Sofar or Power-One Solar inverter, equipped with a wifi module or connected to a Wi-Fi data logger from iGEN tech (solarmanpv.com), to a database, Domoticz and/or to PVoutput.org.</p>
 <p>This script is designed to be run as a cronjob (or scheduled tasks on Windows) every minute.
 <br>Every time this script is run the data from the inverter(s) will be send to the enabled plugin(s).
 <br>And with a five minute interval the data will also be uploaded to PVoutput.org as a live status when enabled.</p>
 
-<h2>Origin</h2><hr>
+<h2>Origin</h2>
 <p>This is based on the original work of Wouter van der Zwan and includes some improvements made by others.</p>
 
-<h2>Supported inverters</h2><hr>
+<h2>Supported inverters</h2>
 <p>Users reported that this script works for wifi kits with a s/n starting with 602xxxxxx to 606xxxxxx.
 <br>Also tested with a Wifi kit in a Hosola inverter in the 611xxxxx range.
 <br>Also works for newer 1601xxxxxx WiFi kit as used in the Omnik TL2 inverters.
@@ -17,7 +16,7 @@
 <br>So sniffing the data send to the omnik portal is required, see OmnikMQTT by wouterbaake (<a href="https://github.com/wouterbaake/OmnikMQTT">https://github.com/wouterbaake/OmnikMQTT</a>).
 <br>Owners of a Wifi kit starting with s/n 402xxxxxxx should checkout Omnikol-PV-Logger by t3kpunk (<a href="https://github.com/t3kpunk/Omniksol-PV-Logger">https://github.com/t3kpunk/Omniksol-PV-Logger</a>).</p>
 
-<h2>Installation and Setup</h2><hr>
+<h2>Installation and Setup</h2>
 <ul>
 <li>Install Python</li>
 <li>Git clone the source with <code>git clone https://github.com/XtheOne/Inverter-Data-Logger.git</code></li>
@@ -27,7 +26,7 @@
 <li>Run the script with <code>python InverterExport.py</code> or better set a scheduled task or cronjob. (See <a href="#cronjob">'Setting cronjob')</a></li>
 </ul>
 
-<h2><a name="configuration"></a>Configuration</h2><hr>
+<h2><a name="configuration"></a>Configuration</h2>
 <p>To enable Domoticz support, enable the DomoticzOutput plugin in the config file. Then Create the following new hardware:
 <li>Name: Inverter Virtual
 <li>Type: Dummy (Does nothing, use for virtual switches only)
@@ -40,9 +39,9 @@
     <th>Name</th>
   </tr>
   <tr>
-    <th margin:0;><hr></th>
-    <th><hr></th>
-    <th><hr></th>
+    <th><hr style='margin-top:0em'></th>
+    <th><hr style='margin-top:0em'></th>
+    <th><hr style='margin-top:0em'></th>
   </tr>
   <tr>
   	<th>Electric_meter_idx</th>
@@ -90,7 +89,7 @@
   	<th>AC Frequency</th>
   </tr>
   <tr>
-  	<th align="center">--- Optional sensors ---</th>
+  	<th align="center">- Optional sensors -</th>
   </tr>
   <tr>
   	<th>Temp_idx</th>
@@ -146,7 +145,7 @@
 <p>Now go to Devices and fill the Idx of these virtual sensors into the config file.
 <br>This is for a single phase inverter with 2 PV strings and basic values, more virtual sensors can be added for other identifiers.</p>
 
-<h2><a name="cronjob"></a>Setting cronjob</h2><hr>
+<h2><a name="cronjob"></a>Setting cronjob</h2>
 <p><h4>For Linux/Unix</h4>
 This crontab line with these options this will execute the script every minute.
 <li>crontab -e</li>
@@ -179,8 +178,8 @@ Settings (tab) -&gt;
 <li>-&gt; OK</li></ul></ul>
 <p>NOTE: If you need to kill the process manually: open Task Manager &gt; Processes &gt; Tick 'Show Processes from all users' &gt; right click 'python.exe' &gt; select 'End Process'.</p>
 
-<h2>Why copy config-org.cfg, can't I edit it directly?</h2><hr>
+<h2>Why copy config-org.cfg, can't I edit it directly?</h2>
 <p>Yes you can edit config-org.cfg directly. However if you want to update the script your settings will be overwritten with the default values. By creating config.cfg, you can preserve your settings when upgrading.</p>
 
-<h2>Development</h2><hr>
+<h2>Development</h2>
 <p>To help with development when no sun is present a small simulator script can be found in the folder Development. This script works by reading values from to database used by the MysqlOutput, but with the time shifted 6 hours back. To use the simulator, you should use the MysqlOutput to fill the database and configure database settings in de sim-config.cfg file.</p>
