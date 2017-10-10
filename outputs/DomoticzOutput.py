@@ -18,8 +18,9 @@ class DomoticzOutput(PluginLoader.Plugin):
             self.logger.error('no section in configuration file for inverter with ID: {0}, skipping.'.format(msg.id))
             return []
 
-        mt = int(self.config.get('general', 'min_temp'))-0,1
-        mv = int(self.config.get('general', 'min_voltage'))-1
+        mt = int(self.config.get('general', 'min_temp'))-0.1
+        mv = int(self.config.get('general', 'min_voltage'))-0.1
+        mf = int(self.config.get('general', 'min_freq'))-0.1
         
         host = self.config.get(section_id, 'host')
         port = self.config.get(section_id, 'port')
@@ -185,17 +186,17 @@ class DomoticzOutput(PluginLoader.Plugin):
             })
         else: self.logger.debug('AC123 power not defined: '+str(p_ac_t)+' Watt')
         # Send f_ac(1-3)
-        if (30<msg.f_ac(1)<70 and self.config.has_option(section_id, 'AC1_frequency_idx')):
+        if (mf<msg.f_ac(1)<70 and self.config.has_option(section_id, 'AC1_frequency_idx')):
             data_idx_array.update ({
                 self.config.get(section_id, 'AC1_frequency_idx'): msg.f_ac(1),
             })
         else: self.logger.debug('AC1 frequency out of range, or not defined: '+str(msg.f_ac(1))+' Hertz')
-        if (30<msg.f_ac(2)<70 and self.config.has_option(section_id, 'AC2_frequency_idx')):
+        if (mf<msg.f_ac(2)<70 and self.config.has_option(section_id, 'AC2_frequency_idx')):
             data_idx_array.update ({
                 self.config.get(section_id, 'AC2_frequency_idx'): msg.f_ac(2),
             })
         else: self.logger.debug('AC2 frequency out of range, or not defined: '+str(msg.f_ac(2))+' Hertz')
-        if (30<msg.f_ac(3)<70 and self.config.has_option(section_id, 'AC3_frequency_idx')):
+        if (mf<msg.f_ac(3)<70 and self.config.has_option(section_id, 'AC3_frequency_idx')):
             data_idx_array.update ({
                 self.config.get(section_id, 'AC3_frequency_idx'): msg.f_ac(3),
             })
