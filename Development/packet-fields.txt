@@ -48,5 +48,5 @@ errorMsg        93       4       1             errorMsg binary index value.
 main_fwver     101      20       1             Inverter main firmware version.
 slave_fwver    121      20       1             Inverter slave firmware version.
                                                
-checksum    (len-1)      1       1             
+checksum    (len-1)      1       1             checksum of all bytes except headCode, checksum and endCode
 endCode       (len)      1       1             hex(16)

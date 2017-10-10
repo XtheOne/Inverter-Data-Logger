@@ -23,19 +23,22 @@ def generate_string(serial_no):
     Returns:
         str: Information request string for inverter
     """
-    #response = (V4 headCode) + (dataFieldLength) + (contrlCode)
-    #response = '\x68\x02\x40\x30' # from old omnik app
-    response = '\x68\x02\x41\xb1' #from SolarMan / new Omnik app
-    res_ck = sum([ord(c) for c in response])
+    #frame = (V4 headCode) + (dataFieldLength) + (contrlCode) + (command) + (checksum) + (endCode)
+    frame_hdr = '\x68\x02\x41\xb1' #from SolarMan / new Omnik app
     command = '\x01\x00'
-    foo_ck = sum([ord(c) for c in command])
-    double_hex = hex(serial_no)[2:] * 2
-    hex_list = [double_hex[i:i + 2].decode('hex') for i in
-                reversed(range(0, len(double_hex), 2))]
-    cs_count = 152 + res_ck + foo_ck + sum([ord(c) for c in hex_list])
-    checksum = hex(cs_count)[-2:].decode('hex')
-    response += ''.join(hex_list) + command + checksum + '\x16'
-    return response
+    endCode = '\x16'
+
+    serial_hex = bytearray(hex(serial_no)[2:] * 2)
+    tar = bytearray([serial_hex[i:i + 2].decode('hex') for i in reversed(range(0, len(serial_hex), 2))])
+
+    frame = frame_hdr + tar + command + '\x87' + endCode
+
+    checksum = 0
+    frame_bytes = bytearray(frame)
+    for i in range(1, len(frame_bytes) - 2, 1):
+        checksum += frame_bytes[i] & 255
+    frame_bytes[len(frame_bytes) - 2] = int((checksum & 255))
+    return "".join(map(chr, frame_bytes))
 
 def expand_path(path):
     """
