@@ -18,6 +18,7 @@ class DomoticzOutput(PluginLoader.Plugin):
             self.logger.error('no section in configuration file for inverter with ID: {0}, skipping.'.format(msg.id))
             return []
 
+        mt = int(self.config.get('general', 'min_temp'))-0,1
         mv = int(self.config.get('general', 'min_voltage'))-1
         
         host = self.config.get(section_id, 'host')
@@ -50,7 +51,7 @@ class DomoticzOutput(PluginLoader.Plugin):
             self.config.get(section_id, 'Electric_meter_idx'): str(p_ac_t)+';'+str(e_total*1000),
         }
         # sometimes the inverter gives 514,7 as temperature, don't send temp then!
-        if (msg.temperature<300 and self.config.has_option(section_id, 'Temp_idx')):
+        if (mt<msg.temperature<300 and self.config.has_option(section_id, 'Temp_idx')):
             data_idx_array.update ({
                 self.config.get(section_id, 'Temp_idx'): msg.temperature,
             })

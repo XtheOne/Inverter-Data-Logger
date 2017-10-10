@@ -47,8 +47,8 @@ class InverterMsg(object):
             int or float: Value stored at location `begin`
         """
         num = struct.unpack('!H', self.raw_msg[begin:begin + 2])[0]
-        if num == 65535:
-            return -1
+        if num > 32767:
+            return float(65536 - num) / divider
         else:
             return float(num) / divider
 
