@@ -36,7 +36,7 @@ HEX: 16           (V4 endCode)
 
 Command: len(raw)  len(dfl)  Reply
 0000                         No response
-0001     183       169       inverter data
+0001     183       169       inverter data frame
 0002      25        11       ERR=-1
 0003                         No response
 0004     257         0       empty frame with only cs/endCode then inverter sn and some data
