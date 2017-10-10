@@ -152,13 +152,13 @@ class InverterMsg(object):
     def main_fwver(self):
         """Inverter main firmware version."""
         if (self.__get_int(101) == 0): return ""
-        return re.sub('[^\x28-\x80]', '', self.__get_string(101, 120))
+        return re.sub('[^\x20-\x7f]', '', self.__get_string(101, 120))
 
     @property
     def slave_fwver(self):
         """Inverter slave firmware version."""
         if (self.__get_int(121) == 0): return ""
-        return re.sub('[^\x28-\x80]', '', self.__get_string(121, 140))
+        return re.sub('[^\x20-\x7f]', '', self.__get_string(121, 140))
 
     def v_pv(self, i=1):
         """Voltage of PV input channel.

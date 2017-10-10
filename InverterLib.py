@@ -23,17 +23,18 @@ def generate_string(serial_no):
     Returns:
         str: Information request string for inverter
     """
+    #response = (V4 headCode) + (dataFieldLength) + (contrlCode)
     #response = '\x68\x02\x40\x30' # from old omnik app
     response = '\x68\x02\x41\xb1' #from SolarMan / new Omnik app
     res_ck = sum([ord(c) for c in response])
-    footer = '\x01\x00' # x02\x00 geeft ERR= -1
-    foo_ck = sum([ord(c) for c in footer])
+    command = '\x01\x00'
+    foo_ck = sum([ord(c) for c in command])
     double_hex = hex(serial_no)[2:] * 2
     hex_list = [double_hex[i:i + 2].decode('hex') for i in
                 reversed(range(0, len(double_hex), 2))]
     cs_count = 152 + res_ck + foo_ck + sum([ord(c) for c in hex_list])
     checksum = hex(cs_count)[-2:].decode('hex')
-    response += ''.join(hex_list) + footer + checksum + '\x16'
+    response += ''.join(hex_list) + command + checksum + '\x16'
     return response
 
 def expand_path(path):

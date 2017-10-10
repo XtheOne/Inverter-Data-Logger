@@ -30,10 +30,17 @@ HEX: 02           (dataFieldLength)
 HEX: 41 b1        (contrlCode)
 HEX: e8 e4 71 5f  (reversed hex notation of the logger s/n)
 HEX: e8 e4 71 5f  (reversed hex notation of the logger s/n)
-HEX: 01 00        (data)
+HEX: 01 00        (command)
 HEX: 2d           (checksum)
 HEX: 16           (V4 endCode)
 
+Command: len(raw)  len(dfl)  Reply
+0000                         No response
+0001     183       169       inverter data
+0002      25        11       ERR=-1
+0003                         No response
+0004     257         0       empty frame with only cs/endCode then inverter sn and some data
+high byte seems to be ignored
 
 This response frame is repeated for every connected inverter. (also to a server)
 Response (183 bytes):
