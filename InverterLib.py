@@ -9,8 +9,8 @@ def getNetworkIp():
     s.connect(('<broadcast>', 0))
     return s.getsockname()[0]
 
-def generate_string(serial_no):
-    """Create request string for inverter.
+def createV4RequestFrame(logger_sn):
+    """Create request frame for inverter logger.
 
     The request string is build from several parts. The first part is a
     fixed 4 char string; the second part is the reversed hex notation of
@@ -18,20 +18,20 @@ def generate_string(serial_no):
     the double s/n with an offset; and finally a fixed ending char.
 
     Args:
-        serial_no (int): Serial number of the inverter
+        logger_sn (int): Serial number of the inverter
 
     Returns:
         str: Information request string for inverter
     """
-    #frame = (V4 headCode) + (dataFieldLength) + (contrlCode) + (command) + (checksum) + (endCode)
+    #frame = (headCode) + (dataFieldLength) + (contrlCode) + (sn) + (sn) + (command) + (checksum) + (endCode)
     frame_hdr = '\x68\x02\x41\xb1' #from SolarMan / new Omnik app
     command = '\x01\x00'
     endCode = '\x16'
 
-    serial_hex = bytearray(hex(serial_no)[2:] * 2)
+    serial_hex = bytearray(hex(logger_sn)[2:])
     tar = bytearray([serial_hex[i:i + 2].decode('hex') for i in reversed(range(0, len(serial_hex), 2))])
 
-    frame = frame_hdr + tar + command + '\x87' + endCode
+    frame = frame_hdr + tar + tar + command + '\x87' + endCode
 
     checksum = 0
     frame_bytes = bytearray(frame)

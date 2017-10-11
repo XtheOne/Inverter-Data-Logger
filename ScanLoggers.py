@@ -9,13 +9,13 @@ import sys
 import InverterMsg  # Import the Msg handler
 import InverterLib  # Import the library
 
-def get_inverter_sn(wifi_serial, wifi_ip):
-    data = InverterLib.generate_string(int(wifi_serial))
+def get_inverter_sn(logger_sn, logger_ip):
+    data = InverterLib.createV4RequestFrame(int(logger_sn))
 #    print >>sys.stdout, 'DATA = %s' % data
     logger_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     logger_socket.settimeout(3)
     # Connect the socket to the port where the server is listening
-    logger_socket.connect((wifi_ip, 8899))
+    logger_socket.connect((logger_ip, 8899))
     logger_socket.sendall(data)
 
     print >>sys.stdout, 'Listing Inverter(s) connected to this WiFi logger'
@@ -64,13 +64,13 @@ try:
         else:
             if (data == SendData): continue #skip sent data
             a = data.split(',')
-            wifi_ip, wifi_mac, wifi_sn = a[0],a[1],a[2]
-            print >>sys.stdout, 'WiFi kit logger found, IP = %s and S/N = %s' % (wifi_ip, wifi_sn)
-            data = InverterLib.generate_string(int(wifi_sn))
+            logger_ip, logger_mac, logger_sn = a[0],a[1],a[2]
+            print >>sys.stdout, 'WiFi kit logger found, IP = %s and S/N = %s' % (logger_ip, logger_sn)
+            data = InverterLib.createV4RequestFrame(int(logger_sn))
             logger_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             logger_socket.settimeout(3)
             # Connect the socket to the port where the server is listening
-            logger_socket.connect((wifi_ip, 8899))
+            logger_socket.connect((logger_ip, 8899))
             logger_socket.sendall(data)
         
             print >>sys.stdout, 'Listing Inverter(s) connected to this WiFi logger'
