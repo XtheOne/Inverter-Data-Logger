@@ -10,7 +10,7 @@ import InverterMsg  # Import the Msg handler
 import InverterLib  # Import the library
 
 def get_inverter_sn(logger_sn, logger_ip):
-    data = InverterLib.createV4RequestFrame(int(logger_sn))
+    data = InverterLib.createV5RequestFrame(int(logger_sn))
 #    print >>sys.stdout, 'DATA = %s' % data
     logger_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     logger_socket.settimeout(3)
@@ -67,10 +67,7 @@ try:
             a = data.split(',')
             logger_ip, logger_mac, logger_sn = a[0],a[1],a[2]
             print >>sys.stdout, 'WiFi kit logger found, IP = %s and S/N = %s' % (logger_ip, logger_sn)
-            if (logger_sn[3::]==190):
-                data = InverterLib.createV5RequestFrame(int(logger_sn))
-            else:
-                data = InverterLib.createV4RequestFrame(int(logger_sn))
+            data = InverterLib.createV5RequestFrame(int(logger_sn))
             logger_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             logger_socket.settimeout(3)
             # Connect the socket to the port where the server is listening

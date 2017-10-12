@@ -110,7 +110,7 @@ class InverterExport(object):
             if (next):
                 continue
 
-            data = InverterLib.createV4RequestFrame(int(sn))
+            data = InverterLib.createV5RequestFrame(int(sn))
             logger_socket.sendall(data)
     
             #dump raw data to log
