@@ -54,8 +54,8 @@ def createV5RequestFrame(logger_sn):
     Returns:
         str: Information request string for inverter
     """
-    #frame = (headCode) + (dataFieldLength) + (contrlCode) + (command) + (checksum) + (endCode)
-    frame_hdr = '\xa5\x02\x00\x10\x45' #from SolarMan / new Omnik app
+    #frame = (headCode) + (dataFieldLength) + (contrlCode) + (serialNumber) + (sn) + (command) + (checksum) + (endCode)
+    frame_hdr = '\xa5\x02\x00\x10\x45\x00\x00' #from SolarMan / new Omnik app
     command = '\x01\x00' # dataFieldLength = 2 
     endCode = '\x15'
 
@@ -97,12 +97,13 @@ def getLoggers():
     sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, ttl)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-    SendData = "WIFIKIT-214028-READ" # Lotto/TM = "AT+YZAPP=214028,READ"
+    A11_FIRST_COMMAND = "HF-A11ASSISTHREAD" # Used to send modbus or Wi-Fi config requests.
+    LPB_FIRST_COMMAND = "WIFIKIT-214028-READ"
 
     gateways = ''
     try:
         # Send data to the broadcast address
-        sent = sock.sendto(SendData, ('<broadcast>', 48899))
+        sent = sock.sendto(LPB_FIRST_COMMAND, ('<broadcast>', 48899))
         # Look for responses from all recipients
         while True:
             try:
@@ -110,12 +111,12 @@ def getLoggers():
             except socket.timeout:
                 break
             else:
-                if (data == SendData): continue #skip sent data
+                if (LPB_FIRST_COMMAND in data or A11_FIRST_COMMAND in data): continue #skip sent data
                 a = data.split(',')
-                wifi_ip, wifi_mac, wifi_sn = a[0],a[1],a[2]
+                logger_ip, logger_mac, logger_sn = a[0],a[1],a[2]
                 if (len(gateways)>1):
-                    gateways = gateways+','
-                gateways = gateways+wifi_ip+','+wifi_sn
+                    gateways += ','
+                gateways += logger_ip+','+logger_sn
     
     finally:
         sock.close()
