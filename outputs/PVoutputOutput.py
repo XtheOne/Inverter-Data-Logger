@@ -18,12 +18,12 @@ class PVoutputOutput(PluginLoader.Plugin):
 
         if (now.minute % 5) == 0:  # Only run at every 5 minute interval
 
-            sys_id = 'sysid-'+msg.id
+            sys_id = 'sysid-'+msg.id.rstrip()
             if not self.config.has_option('pvout', sys_id):
                 self.logger.error('no sysid in configuration file for inverter with ID: {0}, skipping.'.format(msg.id))
                 return []
 
-            api_key = 'apikey-'+msg.id
+            api_key = 'apikey-'+msg.id.rstrip()
             if not self.config.has_option('pvout', api_key):
                 self.logger.error('no apikey in configuration file for inverter with ID: {0}, skipping.'.format(msg.id))
                 return []
