@@ -1,5 +1,6 @@
 import PluginLoader
-import datetime
+from datetime import datetime
+from pytz import timezone
 import urllib
 import urllib2
 
@@ -14,7 +15,8 @@ class PVoutputOutput(PluginLoader.Plugin):
             msg (InverterMsg.InverterMsg): Message to process
 
         """
-        now = datetime.datetime.now()
+        timezone = timezone('Europe/Amsterdam')
+        now = datetime.now(timezone)
 
         if (now.minute % 5) == 0:  # Only run at every 5 minute interval
 
