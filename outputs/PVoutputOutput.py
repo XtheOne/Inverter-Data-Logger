@@ -15,8 +15,8 @@ class PVoutputOutput(PluginLoader.Plugin):
             msg (InverterMsg.InverterMsg): Message to process
 
         """
-        timezone = timezone('Europe/Amsterdam')
-        now = datetime.now(timezone)
+        timezoner = timezone('Europe/Amsterdam')
+        now = datetime.now(timezoner)
 
         if (now.minute % 5) == 0:  # Only run at every 5 minute interval
 
