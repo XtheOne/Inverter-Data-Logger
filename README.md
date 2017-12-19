@@ -2,7 +2,8 @@
 Inverter Data Logger is a small script for uploading data from a 
 Omnik, Hosola, Goodwe, Solax, Ginlong, Samil, Sofar or Power-One
 Solar inverter, equipped with a wifi module or connected to a Wi-Fi data logger
-from iGEN tech (solarmanpv.com), to a database, Domoticz and/or to PVoutput.org.
+from [iGEN tech](http://solarmanpv.com/index_en.html), to a database, [Domoticz](http://domoticz.com/) 
+and/or to [PVoutput.org](https://pvoutput.org/).
 
 This script is designed to be run as a cronjob (or scheduled tasks on Windows) every minute.
 Every time this script is run the data from the inverter(s) will be send to the enabled plugin(s).
@@ -12,23 +13,23 @@ And with a five minute interval the data will also be uploaded to PVoutput.org a
 This is based on the original work of Wouter van der Zwan and includes some improvements made by others.
 
 ## Supported inverters
-Users reported that this script works for wifi kits with a s/n starting with
-602xxxxxx to 606xxxxxx. Also tested with a Wifi kit in a Hosola inverter in the 611xxxxx range.
-Also works for newer 1601xxxxxx WiFi kit as used in the Omnik TL2 inverters.
-Also works with iGEN Wi-Fi external loggers with s/n starting with 504xxxxxx
-With wifi kits in the range 601xxxxxx it is not
-possible to get the data directly from the inverter. So sniffing the data send
-to the omnik portal is required, see OmnikMQTT by wouterbaake
-(https://github.com/wouterbaake/OmnikMQTT) .
+- Users reported that this script works for wifi kits with a s/n starting with 602xxxxxx to 606xxxxxx.
+- Also tested with a Wifi kit in a Hosola inverter in the 611xxxxx range.\
+- Also works for newer 1601xxxxxx WiFi kit as used in the Omnik TL2 inverters.\
+- Also works with iGEN Wi-Fi external loggers with s/n starting with 504xxxxxx
+
+With wifi kits in the range 601xxxxxx it is **not** possible to get the data directly from the 
+inverter. So sniffing the data send to the Omnik portal is required, see [OmnikMQTT by 
+wouterbaake](https://github.com/wouterbaake/OmnikMQTT) .
 
 Owners of a Wifi kit starting with s/n 402xxxxxxx should checkout
-Omnikol-PV-Logger by t3kpunk (https://github.com/t3kpunk/Omniksol-PV-Logger).
+[Omnikol-PV-Logger by t3kpunk](https://github.com/t3kpunk/Omniksol-PV-Logger).
 
 ## Installation and Setup
 * Install Python
 * Git clone the source with `git clone https://github.com/XtheOne/Inverter-Data-Logger.git`
-* Copy the config-org.cfg to config.cfg
-* Change the settings in config.cfg (See '[Configuration](#configuration)')
+* Copy the `config-org.cfg` to `config.cfg`
+* Change the settings in `config.cfg` (See '[Configuration](#configuration)')
 * Test your settings with `python LiveStats.py`, when successful you should see data from your inverter.
 * Run the script with `python InverterExport.py` or better set a scheduled task or cronjob. (See '[Setting cronjob](#setting-cronjob)')
 
@@ -71,7 +72,7 @@ This is for a single phase inverter with 2 PV strings and basic values, more vir
 #### For Linux/Unix
 This crontab line with these options this will execute the script every minute.
 * crontab -e
-* Add row: * * * * * /usr/bin/python /home/username/Inverter-Data-Logger/InverterExport.py
+* Add row: `* * * * * /usr/bin/python /home/username/Inverter-Data-Logger/InverterExport.py`
 
 #### For Windows
 This scheduled task with these options this will execute the script every minute.
@@ -104,13 +105,13 @@ or
 NOTE: If you need to kill the process manually: open Task Manager > Processes > Tick 'Show Processes from all users' > right click 'python.exe' > select 'End Process'.
 
 ### Why copy config-org.cfg, can't I edit it directly?
-Yes you can edit config-org.cfg directly. However if you want to update the 
+Yes you can edit `config-org.cfg` directly. However, if you want to update the 
 script your settings will be overwritten with the default values. By creating 
-config.cfg, you can preserve your settings when upgrading.
+`config.cfg`, you can preserve your settings when upgrading.
 
 ## Development
 To help with development when no sun is present a small simulator script can be
 found in the folder Development. This script works by reading values from to
 database used by the MysqlOutput, but with the time shifted 6 hours back. To use
 the simulator, you should use the MysqlOutput to fill the database and configure
-database settings in de sim-config.cfg file.
+database settings in de `sim-config.cfg` file.
