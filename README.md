@@ -14,8 +14,8 @@ This is based on the original work of Wouter van der Zwan and includes some impr
 
 ## Supported inverters
 - Users reported that this script works for wifi kits with a s/n starting with 602xxxxxx to 606xxxxxx.
-- Also tested with a Wifi kit in a Hosola inverter in the 611xxxxx range.\
-- Also works for newer 1601xxxxxx WiFi kit as used in the Omnik TL2 inverters.\
+- Also tested with a Wifi kit in a Hosola inverter in the 611xxxxx range.
+- Also works for newer 1601xxxxxx WiFi kit as used in the Omnik TL2 inverters.
 - Also works with iGEN Wi-Fi external loggers with s/n starting with 504xxxxxx
 
 With wifi kits in the range 601xxxxxx it is **not** possible to get the data directly from the 
