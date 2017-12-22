@@ -1,7 +1,6 @@
 import PluginLoader
 import datetime
 import urllib
-import urllib2
 
 class DomoticzOutput(PluginLoader.Plugin):
     """Sends the data from the inverter to Domoticz."""
@@ -213,13 +212,13 @@ class DomoticzOutput(PluginLoader.Plugin):
 
             get_data_encoded = urllib.urlencode(get_data)
             self.logger.debug(url + '?' + get_data_encoded)
-            request_object = urllib2.Request(url + '?' + get_data_encoded)
+            request_object = urllib.Request(url + '?' + get_data_encoded)
             try:
-                response = urllib2.urlopen(request_object)
-            except urllib2.HTTPError, e:
+                response = urllib.request.urlopen(request_object)
+            except urllib.error.HTTPError as e:
                 self.logger.error('HTTP error : '+str(e.code)+' Reason: '+str(e.reason))
                 return []
-            except urllib2.URLError, e:
+            except urllib.error.URLError as e:
                 self.logger.error('URL error : '+str(e.args)+' Reason: '+str(e.reason))
                 return []
             else:

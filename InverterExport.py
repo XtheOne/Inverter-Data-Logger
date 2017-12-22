@@ -7,7 +7,10 @@ import socket  # Needed for talking to logger
 import sys
 import logging
 import logging.config
-import ConfigParser
+try:
+    import configparser as ConfigParser
+except:
+    import ConfigParser
 import optparse
 import os
 import re
@@ -121,7 +124,7 @@ class InverterExport(object):
     
                 try:
                     data = logger_socket.recv(1024)
-                except socket.timeout, e:
+                except socket.timeout:
                     self.logger.error('Timeout connecting to logger with IP: {0} and SN {1}, trying next logger.'.format(ip, sn))
                     okflag = True
                     continue
