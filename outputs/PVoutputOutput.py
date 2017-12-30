@@ -58,7 +58,7 @@ class PVoutputOutput(PluginLoader.Plugin):
 
             get_data.update ({
                 'v6': msg.v_pv(1)
-            })    
+            })
 
             get_data_encoded = urllib.urlencode(get_data)
             self.logger.debug(url + '?' + get_data_encoded)

@@ -39,4 +39,3 @@ class MysqlOutput(PluginLoader.Plugin):
         con.commit()
         cur.close()
         con.close()
-        

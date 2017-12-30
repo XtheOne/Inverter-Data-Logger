@@ -72,22 +72,22 @@ try:
             # Connect the socket to the port where the server is listening
             logger_socket.connect((logger_ip, 8899))
             logger_socket.sendall(data)
-        
+
             print >>sys.stdout, 'Listing Inverter(s) connected to this WiFi logger'
             okflag = False
             while (not okflag):
                 data = logger_socket.recv(1500)
                 msg = InverterMsg.InverterMsg(data)
-        
+
                 if (msg.msg)[:9] == 'DATA SEND':
                     logger_socket.close()
                     okflag = True
                     continue
-        
+
                 print >>sys.stdout, 'Inverter SN = %s' % msg.id
                 print >>sys.stdout, 'Inverter main firmware version: = %s' % msg.main_fwver
                 print >>sys.stdout, 'Inverter slave firmware version: = %s' % msg.slave_fwver
-        
+
             logger_socket.close()
 
 finally:

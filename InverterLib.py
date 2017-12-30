@@ -85,7 +85,7 @@ def getLoggers():
                 if (len(gateways)>1):
                     gateways = gateways+','
                 gateways = gateways+wifi_ip+','+wifi_sn
-    
+
     finally:
         sock.close()
         return gateways
