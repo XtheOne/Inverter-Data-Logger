@@ -74,4 +74,4 @@ class PVoutputOutput(PluginLoader.Plugin):
             else:
                 self.logger.debug(response.read())  # Show the response
 
-        self.logger.error('Not sending to PVoutput, not within 5 minutes interval.')
+        self.logger.debug('Not sending to PVoutput, not within 5 minutes interval.')
