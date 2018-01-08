@@ -20,7 +20,7 @@ class DomoticzOutput(PluginLoader.Plugin):
         mt = int(self.config.get('general', 'min_temp'))-0.1
         mv = int(self.config.get('general', 'min_voltage'))-0.1
         mf = int(self.config.get('general', 'min_freq'))-0.1
-        
+
         host = self.config.get(section_id, 'host')
         port = self.config.get(section_id, 'port')
         path = self.config.get(section_id, 'path')
