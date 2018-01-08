@@ -49,16 +49,17 @@ class PVoutputOutput(PluginLoader.Plugin):
                 'v1': msg.e_today * 1000,
                 'v2': msg.p_ac(1),
             }
-            # sometimes the inverter gives 514,7 as temperature, don't send temp then!
-            if (msg.temperature<300 and self.config.getboolean('general', 'use_temperature')):
-                get_data.update ({
-                    'v5': msg.temperature,
-                })
-            else: self.logger.error('temperature out of range: '+str(msg.temperature))
+            if self.config.getboolean('general', 'use_temperature'):
+                # sometimes the inverter gives 514,7 as temperature, don't send temp then!
+                if msg.temperature < 300:
+                    get_data.update ({
+                        'v5': msg.temperature,
+                    })
+                else: self.logger.error('temperature out of range: '+str(msg.temperature))
 
             get_data.update ({
                 'v6': msg.v_pv(1)
-            })    
+            })
 
             get_data_encoded = urllib.urlencode(get_data)
             self.logger.debug(url + '?' + get_data_encoded)
@@ -74,4 +75,4 @@ class PVoutputOutput(PluginLoader.Plugin):
             else:
                 self.logger.debug(response.read())  # Show the response
 
-        self.logger.error('Not sending to PVoutput, not within 5 minutes interval.')
+        self.logger.debug('Not sending to PVoutput, not within 5 minutes interval.')
