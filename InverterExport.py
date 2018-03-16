@@ -117,7 +117,7 @@ class InverterExport(object):
             logger_socket.sendall(data)
 
             #dump raw data to log
-            self.logger.debug('RAW sent Packet (len={0}): '.format(len(data))+':'.join(x.encode('hex') for x in data)+'  '+re.sub('[^\x20-\x7f]', '', ''.join(x for x in data)))
+            #self.logger.debug('RAW sent Packet (len={0}): '.format(len(data))+':'.join(x.encode('hex') for x in data)+'  '+re.sub('[^\x20-\x7f]', '', ''.join(x for x in data)))
 
             okflag = False
             while (not okflag):
@@ -130,7 +130,7 @@ class InverterExport(object):
                     continue
 
                 #dump raw data to log
-                self.logger.debug('RAW received Packet (len={0}): '.format(len(data))+':'.join(x.encode('hex') for x in data)+'  '+re.sub('[^\x20-\x7f]', '', ''.join(x for x in data)))
+                #self.logger.debug('RAW received Packet (len={0}): '.format(len(data))+':'.join(x.encode('hex') for x in data)+'  '+re.sub('[^\x20-\x7f]', '', ''.join(x for x in data)))
 
                 msg = InverterMsg.InverterMsg(data)
 
@@ -155,7 +155,7 @@ class InverterExport(object):
                 self.logger.info("RUN State: {0}".format(msg.run_state))
 
                 for plugin in Plugin.plugins:
-                    self.logger.debug('Run plugin' + plugin.__class__.__name__)
+                    self.logger.debug('Run plugin: ' + plugin.__class__.__name__ + '\n')
                     plugin.process_message(msg)
 
     def build_logger(self, config):
