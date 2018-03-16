@@ -1,6 +1,7 @@
 import socket
 import struct
 import os
+import binascii
 import sys
 
 if sys.version[0] == '2':
@@ -29,20 +30,20 @@ def createV4RequestFrame(logger_sn):
         str: Information request string for inverter
     """
     #frame = (headCode) + (dataFieldLength) + (contrlCode) + (sn) + (sn) + (command) + (checksum) + (endCode)
-    frame_hdr = '\x68\x02\x41\xb1' #from SolarMan / new Omnik app
-    command = '\x01\x00'
-    endCode = '\x16'
+    frame_hdr = binascii.unhexlify('680241b1') #from SolarMan / new Omnik app
+    command = binascii.unhexlify('0100')
+    defchk = binascii.unhexlify('87')
+    endCode = binascii.unhexlify('16')
 
-    tar = (bytearray.fromhex(hex(logger_sn)[8:10] + hex(logger_sn)[6:8] + hex(logger_sn)[4:6] + hex(logger_sn)[2:4])).decode('cp437')
-
-    frame = bytearray((frame_hdr + tar + tar + command + '\x87' + endCode).encode())
+    tar = bytearray.fromhex(hex(logger_sn)[8:10] + hex(logger_sn)[6:8] + hex(logger_sn)[4:6] + hex(logger_sn)[2:4])
+    frame = bytearray(frame_hdr + tar + tar + command + defchk + endCode)
 
     checksum = 0
     frame_bytes = bytearray(frame)
     for i in range(1, len(frame_bytes) - 2, 1):
         checksum += frame_bytes[i] & 255
     frame_bytes[len(frame_bytes) - 2] = int((checksum & 255))
-    return "".join(map(chr, frame_bytes))
+    return bytearray(frame_bytes)
 
 def expand_path(path):
     """
