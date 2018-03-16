@@ -1,5 +1,6 @@
 # from https://gist.github.com/will-hart/5899567
-
+# Needs six module, run: pip install six
+from six import add_metaclass
 
 class PluginMount(type):
     """
@@ -29,10 +30,9 @@ class PluginMount(type):
         # save the plugin reference
         cls.plugins.append(instance)
 
-
+@add_metaclass(PluginMount)
 class Plugin(object):
     """A plugin which must provide a process_message() method"""
-    __metaclass__ = PluginMount
 
     config = None
     logger = None
