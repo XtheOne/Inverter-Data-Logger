@@ -1,7 +1,11 @@
 import socket
 import struct
 import os
-import binascii
+import sys
+
+if sys.version[0] == '2':
+    reload(sys)
+    sys.setdefaultencoding('cp437')
 
 def getNetworkIp():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -29,10 +33,9 @@ def createV4RequestFrame(logger_sn):
     command = '\x01\x00'
     endCode = '\x16'
 
-    serial_hex = bytearray(hex(logger_sn)[2:], 'utf8')
-    tar = bytearray([binascii.hexlify(serial_hex[i:i + 2]) for i in reversed(range(0, len(serial_hex), 2))])
+    tar = (bytearray.fromhex(hex(logger_sn)[8:10] + hex(logger_sn)[6:8] + hex(logger_sn)[4:6] + hex(logger_sn)[2:4])).decode('cp437')
 
-    frame = frame_hdr + tar + tar + command + '\x87' + endCode
+    frame = bytearray((frame_hdr + tar + tar + command + '\x87' + endCode).encode())
 
     checksum = 0
     frame_bytes = bytearray(frame)
