@@ -20,7 +20,7 @@ class InverterMsg(object):
         Returns:
             str: String in the message from start to end
         """
-        return self.raw_msg[begin:end]
+        return self.raw_msg[begin:end].decode('cp437')
 #
     def __get_int(self, begin):
         """Extract byte value from message.
