@@ -31,6 +31,8 @@ class InverterMsg(object):
         Returns:
             int: value at offset
         """
+        if (len(self.raw_msg) < begin):
+            return 0
         return int(binascii.hexlify(bytearray(self.raw_msg[begin:begin+1])), 16)
 #
     def __get_short(self, begin, divider=10):
