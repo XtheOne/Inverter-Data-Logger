@@ -7,10 +7,11 @@ import socket  # Needed for talking to logger
 import sys
 import logging
 import logging.config
-try:
-    import configparser as ConfigParser
-except:
-    import ConfigParser
+import sys
+if sys.version[:1] == '2':
+    import ConfigParser as configparser
+else:
+    import configparser
 import optparse
 import os
 import re
@@ -33,7 +34,7 @@ class InverterExport(object):
         config_files = [InverterLib.expand_path('config-default.cfg'),
                         InverterLib.expand_path(config_file)]
 
-        self.config = ConfigParser.RawConfigParser()
+        self.config = configparser.RawConfigParser()
         self.config.read(config_files)
 
         # add command line option -p / --plugins to override the output plugins used
@@ -124,7 +125,7 @@ class InverterExport(object):
 
                 try:
                     data = logger_socket.recv(1024)
-                except socket.timeout:
+                except socket.timeout as e:
                     self.logger.error('Timeout connecting to logger with IP: {0} and SN {1}, trying next logger.'.format(ip, sn))
                     okflag = True
                     continue
@@ -155,7 +156,7 @@ class InverterExport(object):
                 self.logger.info("RUN State: {0}".format(msg.run_state))
 
                 for plugin in Plugin.plugins:
-                    self.logger.debug('Run plugin: ' + plugin.__class__.__name__ + '\n')
+                    self.logger.debug('Run plugin' + plugin.__class__.__name__)
                     plugin.process_message(msg)
 
     def build_logger(self, config):
@@ -165,7 +166,7 @@ class InverterExport(object):
 
 
         Args:
-            config: ConfigParser with settings from file
+            config: configparser with settings from file
         """
         log_levels = dict(notset=0, debug=10, info=20, warning=30, error=40, critical=50)
         log_dict = {
