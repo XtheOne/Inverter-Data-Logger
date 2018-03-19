@@ -151,8 +151,9 @@ class InverterExport(object):
                     continue
 
                 self.logger.info("Inverter ID: {0}".format(msg.id))
-                self.logger.info("Inverter main firmware version: {0}".format(msg.main_fwver))
-                self.logger.info("Inverter slave firmware version: {0}".format(msg.slave_fwver))
+                if (msg.len > 140):
+                    self.logger.info("Inverter main firmware version: {0}".format(msg.main_fwver))
+                    self.logger.info("Inverter slave firmware version: {0}".format(msg.slave_fwver))
                 self.logger.info("RUN State: {0}".format(msg.run_state))
 
                 for plugin in Plugin.plugins:
