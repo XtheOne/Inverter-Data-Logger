@@ -12,7 +12,11 @@ class CSVOutput(PluginLoader.Plugin):
         Args:
             msg (InverterMsg.InverterMsg): Message to process
         """
-        csvfilename = self.config.get('csv', 'csv_file_name')
+        if (self.config.getboolean('csv', 'daily_file')):
+            csvfilename = datetime.now().strftime("%Y-%m-%d") + "_" + self.config.get('csv', 'csv_file_name')
+        else:
+            csvfilename = self.config.get('csv', 'csv_file_name')
+
         if (not os.path.exists(csvfilename)) & (not self.config.getboolean('csv', 'disable_header')):
             file = open(csvfilename, 'w')
             file.write ("DateTime,ID,Temp,VPV1,VPV2,VPV3,IPV1,IPV2,IPV3,IAC1,IAC2,IAC3," \
