@@ -26,11 +26,11 @@ Owners of a Wifi kit starting with s/n 402xxxxxxx should checkout
 [Omnikol-PV-Logger by t3kpunk](https://github.com/t3kpunk/Omniksol-PV-Logger).
 
 ## Installation and Setup
-* Install Python
+* Install Python (tested with python-2.7.14 and python-3.6.4)
 * Git clone the source with `git clone https://github.com/XtheOne/Inverter-Data-Logger.git`
 * Copy the `config-org.cfg` to `config.cfg`
 * Change the settings in `config.cfg` (See '[Configuration](#configuration)')
-* Test your settings with `python LiveStats.py`, when successful you should see data from your inverter.
+* Test your settings with `python LiveStats.py`, when successful you should see data from your inverter. (you have to install several modules...)
 * Run the script with `python InverterExport.py` or better set a scheduled task or cronjob. (See '[Setting cronjob](#setting-cronjob)')
 
 ## Configuration
