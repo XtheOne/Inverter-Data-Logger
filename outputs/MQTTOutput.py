@@ -1,6 +1,6 @@
 import PluginLoader
 from datetime import datetime
-import paho.mqtt.client as mqtt
+import paho.mqtt.client as mqtt # pip install paho-mqtt
 
 class MWTTOutput(PluginLoader.Plugin):
         """Outputs the data from the inverter logger to an MQTT server """
@@ -10,7 +10,7 @@ class MWTTOutput(PluginLoader.Plugin):
                 client.username_pw_set( self.config.get('mqtt', 'user'),
                                         self.config.get('mqtt', 'pass'))
                 client.connect( self.config.get('mqtt', 'host'),
-                                self.config.get('mqtt', 'port'))
+                                int(self.config.get('mqtt', 'port')), 60)
 
                 client.publish("power/solar/e_total", msg.e_total)
                 client.publish("power/solar/e_today", msg.e_today)

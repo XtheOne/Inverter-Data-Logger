@@ -1,5 +1,6 @@
 import struct  # Converting bytes to numbers
 import re
+import binascii
 
 class InverterMsg(object):
     """Decode the response message from an inverter logger."""
@@ -19,7 +20,7 @@ class InverterMsg(object):
         Returns:
             str: String in the message from start to end
         """
-        return self.raw_msg[begin:end]
+        return self.raw_msg[begin:end].decode('cp437')
 #
     def __get_int(self, begin):
         """Extract byte value from message.
@@ -30,7 +31,9 @@ class InverterMsg(object):
         Returns:
             int: value at offset
         """
-        return int(self.raw_msg[begin:begin+1].encode('hex'), 16)
+        if (len(self.raw_msg) < begin):
+            return 0
+        return int(binascii.hexlify(bytearray(self.raw_msg[begin:begin+1])), 16)
 #
     def __get_short(self, begin, divider=10):
         """Extract short from message.

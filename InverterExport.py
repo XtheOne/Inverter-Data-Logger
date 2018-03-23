@@ -7,7 +7,11 @@ import socket  # Needed for talking to logger
 import sys
 import logging
 import logging.config
-import ConfigParser
+import sys
+if sys.version[:1] == '2':
+    import ConfigParser as configparser
+else:
+    import configparser
 import optparse
 import os
 import re
@@ -30,7 +34,7 @@ class InverterExport(object):
         config_files = [InverterLib.expand_path('config-default.cfg'),
                         InverterLib.expand_path(config_file)]
 
-        self.config = ConfigParser.RawConfigParser()
+        self.config = configparser.RawConfigParser()
         self.config.read(config_files)
 
         # add command line option -p / --plugins to override the output plugins used
@@ -114,20 +118,20 @@ class InverterExport(object):
             logger_socket.sendall(data)
 
             #dump raw data to log
-            self.logger.debug('RAW sent Packet (len={0}): '.format(len(data))+':'.join(x.encode('hex') for x in data)+'  '+re.sub('[^\x20-\x7f]', '', ''.join(x for x in data)))
+            #self.logger.debug('RAW sent Packet (len={0}): '.format(len(data))+':'.join(x.encode('hex') for x in data)+'  '+re.sub('[^\x20-\x7f]', '', ''.join(x for x in data)))
 
             okflag = False
             while (not okflag):
 
                 try:
                     data = logger_socket.recv(1024)
-                except socket.timeout, e:
+                except socket.timeout as e:
                     self.logger.error('Timeout connecting to logger with IP: {0} and SN {1}, trying next logger.'.format(ip, sn))
                     okflag = True
                     continue
 
                 #dump raw data to log
-                self.logger.debug('RAW received Packet (len={0}): '.format(len(data))+':'.join(x.encode('hex') for x in data)+'  '+re.sub('[^\x20-\x7f]', '', ''.join(x for x in data)))
+                #self.logger.debug('RAW received Packet (len={0}): '.format(len(data))+':'.join(x.encode('hex') for x in data)+'  '+re.sub('[^\x20-\x7f]', '', ''.join(x for x in data)))
 
                 msg = InverterMsg.InverterMsg(data)
 
@@ -163,7 +167,7 @@ class InverterExport(object):
 
 
         Args:
-            config: ConfigParser with settings from file
+            config: configparser with settings from file
         """
         log_levels = dict(notset=0, debug=10, info=20, warning=30, error=40, critical=50)
         log_dict = {

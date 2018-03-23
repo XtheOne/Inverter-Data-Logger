@@ -11,7 +11,7 @@ class MysqlOutput(PluginLoader.Plugin):
         Args:
             msg (InverterMsg.InverterMsg): Message to process
         """
-        import mysql.connector
+        import mysql.connector # pip install mysql-connector-python
 
         self.logger.debug('Connect to database')
         con = mysql.connector.connect(host=self.config.get('mysql', 'host'),

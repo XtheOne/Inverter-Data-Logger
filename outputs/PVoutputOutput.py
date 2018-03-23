@@ -1,9 +1,12 @@
 import PluginLoader
 from datetime import datetime
 from pytz import timezone
-import urllib
-import urllib2
-
+import sys
+if sys.version[:1] == '2':
+    import urllib
+    import urllib2
+else:
+    import urllib.request, urllib.parse, urllib.error
 
 class PVoutputOutput(PluginLoader.Plugin):
     """Sends the data from the inverter logger to PVoutput.org"""
@@ -61,18 +64,34 @@ class PVoutputOutput(PluginLoader.Plugin):
                 'v6': msg.v_pv(1)
             })
 
-            get_data_encoded = urllib.urlencode(get_data)
-            self.logger.debug(url + '?' + get_data_encoded)
-            request_object = urllib2.Request(url + '?' + get_data_encoded)
-            try:
-                response = urllib2.urlopen(request_object)
-            except urllib2.HTTPError, e:
-                self.logger.error('HTTP error : '+str(e.code)+' Reason: '+str(e.reason))
-                return []
-            except urllib2.URLError, e:
-                self.logger.error('URL error : '+str(e.args)+' Reason: '+str(e.reason))
-                return []
+            if sys.version[:1] == '2':
+                get_data_encoded = urllib.urlencode(get_data)
+                self.logger.debug(url + '?' + get_data_encoded)
+                request_object = urllib2.Request(url + '?' + get_data_encoded)
+                try:
+                    response = urllib2.urlopen(request_object)
+                except urllib2.HTTPError as e:
+                    self.logger.error('HTTP error : '+str(e.code)+' Reason: '+str(e.reason))
+                    return []
+                except urllib2.URLError as e:
+                    self.logger.error('URL error : '+str(e.args)+' Reason: '+str(e.reason))
+                    return []
+                else:
+                    self.logger.debug(response.read())  # Show the response
             else:
-                self.logger.debug(response.read())  # Show the response
+                get_data_encoded = urllib.parse.urlencode(get_data)
+                self.logger.debug(url + '?' + get_data_encoded)
+                request_object = urllib.request.Request(url + '?' + get_data_encoded)
+                try:
+                    response = urllib.request.urlopen(request_object)
+                except urllib.error.HTTPError as e:
+                    self.logger.error('HTTP error : '+str(e.code)+' Reason: '+str(e.reason))
+                    return []
+                except urllib.error.URLError as e:
+                    self.logger.error('URL error : '+str(e.args)+' Reason: '+str(e.reason))
+                    return []
+                else:
+                    self.logger.debug(response.read())  # Show the response
 
-        self.logger.debug('Not sending to PVoutput, not within 5 minutes interval.')
+        else:
+            self.logger.debug('Not sending to PVoutput, not within 5 minutes interval.')

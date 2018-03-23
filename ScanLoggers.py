@@ -36,10 +36,10 @@ def get_inverter_sn(logger_sn, logger_ip):
     logger_socket.close()
 
 #main
-print >>sys.stdout, 'This script will look for iGEN WiFi Kit loggers from SolarMAN PV'
-print >>sys.stdout, 'List their IPs and S/Ns and connected inverters S/N'
-print >>sys.stdout, 'These loggers are found in Omnik, Hosola, Ginlong, Kstar, Seasun, SolaX, Samil, Sofar, Trannergy'
-print >>sys.stdout, 'and other Solar inverters'
+sys.stdout.write('This script will look for iGEN WiFi Kit loggers from SolarMAN PV\n')
+sys.stdout.write('List their IPs and S/Ns and connected inverters S/N\n')
+sys.stdout.write('These loggers are found in Omnik, Hosola, Ginlong, Kstar, Seasun, SolaX, Samil, Sofar, Trannergy\n')
+sys.stdout.write('and other Solar inverters\n')
 
 # Create the datagram socket
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -54,7 +54,7 @@ sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 SendData = "WIFIKIT-214028-READ" # Lotto/TM = "AT+YZAPP=214028,READ"
 try:
     # Send data to the broadcast address
-    sent = sock.sendto(SendData, ('<broadcast>', 48899))
+    sent = sock.sendto(SendData.encode('utf-8'), ('<broadcast>', 48899))
     # Look for responses from all recipients
     while True:
         try:
@@ -62,34 +62,35 @@ try:
         except socket.timeout:
             break
         else:
-            if (data == SendData): continue #skip sent data
-            a = data.split(',')
+            if (data == SendData.encode('utf-8')): continue #skip sent data
+            a = data.split(b',')
             logger_ip, logger_mac, logger_sn = a[0],a[1],a[2]
-            print >>sys.stdout, 'WiFi kit logger found, IP = %s and S/N = %s' % (logger_ip, logger_sn)
+            sys.stdout.write('WiFi kit logger found, IP = %s and S/N = %s\n' % (logger_ip, logger_sn))
             data = InverterLib.createV4RequestFrame(int(logger_sn))
             logger_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             logger_socket.settimeout(3)
             # Connect the socket to the port where the server is listening
             logger_socket.connect((logger_ip, 8899))
             logger_socket.sendall(data)
-
-            print >>sys.stdout, 'Listing Inverter(s) connected to this WiFi logger'
+        
+            sys.stdout.write('Listing Inverter(s) connected to this WiFi logger\n')
             okflag = False
             while (not okflag):
                 data = logger_socket.recv(1500)
                 msg = InverterMsg.InverterMsg(data)
-
+        
                 if (msg.msg)[:9] == 'DATA SEND':
                     logger_socket.close()
                     okflag = True
                     continue
-
-                print >>sys.stdout, 'Inverter SN = %s' % msg.id
-                print >>sys.stdout, 'Inverter main firmware version: = %s' % msg.main_fwver
-                print >>sys.stdout, 'Inverter slave firmware version: = %s' % msg.slave_fwver
-
+        
+                sys.stdout.write('Inverter SN = %s\n' % msg.id)
+                sys.stdout.write('Inverter main firmware version: = %s\n')
+                sys.stdout.write('Inverter slave firmware version: = %s\n' % msg.slave_fwver)
+        
             logger_socket.close()
 
 finally:
-    print >>sys.stdout, 'closing socket, scanning done!'
+    sys.stdout.write('closing socket, scanning done!\n')
     sock.close()
+    sys.stdout.flush()
