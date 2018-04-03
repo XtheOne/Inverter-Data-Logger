@@ -118,7 +118,7 @@ class InverterExport(object):
             logger_socket.sendall(data)
 
             #dump raw data to log
-            #self.logger.debug('RAW sent Packet (len={0}): '.format(len(data))+':'.join(x.encode('hex') for x in data)+'  '+re.sub('[^\x20-\x7f]', '', ''.join(x for x in data)))
+            self.logger.debug('RAW sent Packet (len={0}): '.format(len(data))+':'.join(hex(ord(chr(x)))[2:].zfill(2) for x in bytearray(data))+'  '+re.sub('[^\x20-\x7f]', '', ''.join(chr(x) for x in bytearray(data))))
 
             okflag = False
             while (not okflag):
@@ -131,7 +131,7 @@ class InverterExport(object):
                     continue
 
                 #dump raw data to log
-                #self.logger.debug('RAW received Packet (len={0}): '.format(len(data))+':'.join(x.encode('hex') for x in data)+'  '+re.sub('[^\x20-\x7f]', '', ''.join(x for x in data)))
+                self.logger.debug('RAW received Packet (len={0}): '.format(len(data))+':'.join(hex(ord(chr(x)))[2:].zfill(2) for x in bytearray(data))+'  '+re.sub('[^\x20-\x7f]', '', ''.join(chr(x) for x in bytearray(data))))
 
                 msg = InverterMsg.InverterMsg(data)
 
