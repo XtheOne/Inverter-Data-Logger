@@ -84,7 +84,7 @@ class InverterMsg(object):
     @property
     def id(self):
         """ID of the inverter."""
-        return self.__get_string(15, 31).rstrip() #Strip spaces from shorter inverter SN
+        return self.__get_string(15, 31).lstrip().rstrip() #Strip spaces from shorter or padded inverter SN
 
     @property
     def temperature(self):
