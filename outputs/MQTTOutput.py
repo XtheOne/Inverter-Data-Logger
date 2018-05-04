@@ -19,7 +19,7 @@ class MWTTOutput(PluginLoader.Plugin):
                 client.publish(mqtt_topic + "e_total", msg.e_total)
                 client.publish(mqtt_topic + "e_today", msg.e_today)
                 client.publish(mqtt_topic + "h_total", msg.h_total)
-                client.publish(mqtt_topic + "power", msg.power)
+                client.publish(mqtt_topic + "ac_power", msg.p_ac(1))
                 # sometimes the inverter gives 514,7 as temperature, don't send temp then!
                 if (msg.temperature<300 and self.config.getboolean('general', 'use_temperature')):
                     client.publish(mqtt_topic + "temp", msg.temperature)
