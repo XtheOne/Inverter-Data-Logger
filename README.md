@@ -9,6 +9,8 @@ This script is designed to be run as a cronjob (or scheduled tasks on Windows) e
 Every time this script is run the data from the inverter(s) will be send to the enabled plugin(s).
 And with a five minute interval the data will also be uploaded to PVoutput.org as a live status when enabled.
 
+As an alternative a server script can be run which listens for incomming connections from the logger.
+
 ## Origin
 This is based on the original work of Wouter van der Zwan and includes some improvements made by others.
 
@@ -32,6 +34,7 @@ Owners of a Wifi kit starting with s/n 402xxxxxxx should checkout
 * Change the settings in `config.cfg` (See '[Configuration](#configuration)')
 * Test your settings with `python LiveStats.py`, when successful you should see data from your inverter. (you have to install several modules...)
 * Run the script with `python InverterExport.py` or better set a scheduled task or cronjob. (See '[Setting cronjob](#setting-cronjob)')
+* Or run the server script with `python InverterServer.py`
 
 ## Configuration
 To enable Domoticz support, enable the DomoticzOutput plugin in the config file.
@@ -67,6 +70,10 @@ Now Create the following Virtual Sensors:
 
 Now go to Devices and fill the Idx of these virtual sensors into the config file.
 This is for a single phase inverter with 2 PV strings and basic values, more virtual sensors can be added for other identifiers.
+
+## Server config
+To use the Server script configure the listen IP and port and use these in the Wi-Fi-logger.
+Configure Remote Server B or C in the Wi-Fi- logger to point to the InverterServer IP and Port using TCP protocol.
 
 ### Setting cronjob
 #### For Linux/Unix
