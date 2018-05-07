@@ -113,9 +113,9 @@ class InverterMsg(object):
         return self.__get_string(offset[3], offset[3]+16).lstrip().rstrip() #Strip spaces from shorter or padded inverter SN
 
     @property
-    def temperature(self):
+    def temp(self):
         """Temperature recorded by the inverter."""
-        return self.__get_short(offset[4])
+        return self.__get_short(offset[4], 10)
 
     @property
     def e_today(self):

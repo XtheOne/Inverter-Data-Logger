@@ -21,9 +21,9 @@ class MWTTOutput(PluginLoader.Plugin):
                 client.publish(mqtt_topic + "h_total", msg.h_total)
                 client.publish(mqtt_topic + "ac_power", msg.p_ac(1))
                 # sometimes the inverter gives 514,7 as temperature, don't send temp then!
-                if (msg.temperature<300 and self.config.getboolean('general', 'use_temperature')):
-                    client.publish(mqtt_topic + "temp", msg.temperature)
-                else: self.logger.error('temperature out of range: '+str(msg.temperature))
+                if (msg.temp<300 and self.config.getboolean('general', 'use_temperature')):
+                    client.publish(mqtt_topic + "temp", msg.temp)
+                else: self.logger.error('temperature out of range: '+str(msg.temp))
 
                 for x in [1,2,3]:
                         client.publish(mqtt_topic + "v_pv" + str(x), msg.v_pv(x))

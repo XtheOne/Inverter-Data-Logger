@@ -20,7 +20,7 @@ class CSVOutput(PluginLoader.Plugin):
         print (("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9}," +
                "{10},{11},{12},{13},{14},{15},{16},{17},{18},{19}," +
                "{20},{21},{22},{23}")\
-            .format(timestamp, msg.id, msg.temperature,
+            .format(timestamp, msg.id, msg.temp,
                     msg.v_pv(1), msg.v_pv(2), msg.v_pv(3),
                     msg.i_pv(1), msg.i_pv(2), msg.i_pv(3),
                     msg.i_ac(1), msg.i_ac(2), msg.i_ac(3),

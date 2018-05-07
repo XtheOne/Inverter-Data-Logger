@@ -13,7 +13,7 @@ class ConsoleOutput(PluginLoader.Plugin):
         sys.stdout.write('Inverter ID: {0}\n'.format(msg.id))
 
         sys.stdout.write('E Today : {0:>5}   Total: {1:<5}\n'.format(msg.e_today, ((((msg.e_today*10)-(int(msg.e_today*10)))/10)+msg.e_total)))
-        sys.stdout.write('H Total : {0:>5}   Temp : {1:<5}\n'.format(msg.h_total, msg.temperature))
+        sys.stdout.write('H Total : {0:>5}   Temp : {1:<5}\n'.format(msg.h_total, msg.temp))
         sys.stdout.write('errorMsg: {0:>5}\n'.format(msg.errorMsg))
 
         sys.stdout.write('PV1   V: {0:>5}   I: {1:>4}\n'.format(msg.v_pv(1), msg.i_pv(1)))

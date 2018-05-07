@@ -27,7 +27,7 @@ class PostgreSQLOutput(PluginLoader.Plugin):
                     %s, %s, %s
                 );
                 """, (
-                    msg.id, msg.e_total, msg.e_today, msg.temperature, msg.h_total,
+                    msg.id, msg.e_total, msg.e_today, msg.temp, msg.h_total,
                     msg.v_pv(1), msg.v_pv(2), msg.v_pv(3),
                     msg.i_pv(1), msg.i_pv(2), msg.i_pv(3),
                     msg.v_ac(1), msg.v_ac(2), msg.v_ac(3),
