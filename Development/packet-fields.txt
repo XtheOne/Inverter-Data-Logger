@@ -9,8 +9,8 @@ contrlCode       2       2       1             hex(41 b0)
 sn               4       4       1             reversed hex notation of the s/n
 sn               8       4       1             reversed hex notation of the s/n
 Data format ID  12       1       1             hex(81)
-unkown_2        13       1       1             hex(02)
-unkown_3        14       1       1             hex(01) (if hex(06) then f_ac divider changes to 10)
+unkown_1        13       1       1             hex(02)
+unkown_2        14       1       1             hex(01) (if hex(06) then f_ac divider changes to 10)
 
 id              15      16       1             ID of the inverter.
 temperature     31       2      10      oC     Temperature recorded by the inverter.
