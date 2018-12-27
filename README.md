@@ -44,6 +44,7 @@ open config.cfg
 There a few settings that you have to change to get a minimal working script:
 
 set a fixed IP or let the script do a auto-scan:
+```
 [logger]
 # ip,sn,ip,sn,ip,sn or auto
 # IP address of your inverter(s) data logger and S/N of the wifi kit(s)
@@ -54,7 +55,7 @@ gateways = auto
 port = 8899
 # time to wait for inverter logger response
 timeout = 3
-\
+```
 
 ### Setup Domoticz support
 To enable Domoticz support, enable the DomoticzOutput plugin in the config file.
