@@ -30,7 +30,7 @@ Owners of a Wifi kit starting with s/n 402xxxxxxx should checkout
 ## Installation and Setup
 * Install Python (tested with python-2.7.14 and python-3.6.4)
 * Git clone the source with `git clone https://github.com/XtheOne/Inverter-Data-Logger.git`
-* Install python libs: `pip install six` and if you use MQTT install `pip install paho-mqtt`
+* Install python libs: `pip install six` and if you use MQTT install `pip install paho-mqtt` for PVoutput add: `pip install pytz`
 * Copy the `config-org.cfg` to `config.cfg`
 * Change the settings in `config.cfg` (See '[Configuration](#configuration)')
 * Test your settings with `python LiveStats.py`, when successful you should see data from your inverter.
@@ -43,7 +43,7 @@ open config.cfg
 
 There a few settings that you have to change to get a minimal working script:
 
-set a fixed IP or let the script do a auto-scan:
+set a fixed IP for one or more inverters like the example, or let the script do a auto-scan:
 ```
 [logger]
 # ip,sn,ip,sn,ip,sn or auto
@@ -56,6 +56,7 @@ port = 8899
 # time to wait for inverter logger response
 timeout = 3
 ```
+Besure that you have the S/N ready from the inverterm in case that you user the manual input. You can find it in the webpage of your inverter or on the inverter case.
 
 ### Setup Domoticz support
 To enable Domoticz support, enable the DomoticzOutput plugin in the config file.
