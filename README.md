@@ -30,13 +30,35 @@ Owners of a Wifi kit starting with s/n 402xxxxxxx should checkout
 ## Installation and Setup
 * Install Python (tested with python-2.7.14 and python-3.6.4)
 * Git clone the source with `git clone https://github.com/XtheOne/Inverter-Data-Logger.git`
+* Install python libs: `pip install six` and if you use MQTT install `pip install paho-mqtt` for PVoutput add: `pip install pytz`
 * Copy the `config-org.cfg` to `config.cfg`
 * Change the settings in `config.cfg` (See '[Configuration](#configuration)')
-* Test your settings with `python LiveStats.py`, when successful you should see data from your inverter. (you have to install several modules...)
+* Test your settings with `python LiveStats.py`, when successful you should see data from your inverter.
 * Run the script with `python InverterExport.py` or better set a scheduled task or cronjob. (See '[Setting cronjob](#setting-cronjob)')
 * Or run the server script with `python InverterServer.py`
 
 ## Configuration
+
+open config.cfg
+
+There a few settings that you have to change to get a minimal working script:
+
+set a fixed IP for one or more inverters like the example, or let the script do a auto-scan:
+```
+[logger]
+# ip,sn,ip,sn,ip,sn or auto
+# IP address of your inverter(s) data logger and S/N of the wifi kit(s)
+#gateways = 192.168.1.10,602123456, 192.168.1.11,602987654
+# Automatically detect logger(s) on the local network
+gateways = auto
+# Default for the Wifi module/logger/gateway
+port = 8899
+# time to wait for inverter logger response
+timeout = 3
+```
+Besure that you have the S/N ready from the inverterm in case that you user the manual input. You can find it in the webpage of your inverter or on the inverter case.
+
+### Setup Domoticz support
 To enable Domoticz support, enable the DomoticzOutput plugin in the config file.
 Then Create the following new hardware:
 * Name: Inverter Virtual
