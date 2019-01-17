@@ -1,7 +1,11 @@
 import PluginLoader
 import datetime
-import urllib
-import urllib2
+import sys
+if sys.version[:1] == '2':
+    import urllib
+    import urllib2
+else:
+    import urllib.request, urllib.parse, urllib.error
 
 class DomoticzOutput(PluginLoader.Plugin):
     """Sends the data from the inverter to Domoticz."""
@@ -21,7 +25,7 @@ class DomoticzOutput(PluginLoader.Plugin):
         mt = int(self.config.get('general', 'min_temp'))-0.1
         mv = int(self.config.get('general', 'min_voltage'))-0.1
         mf = int(self.config.get('general', 'min_freq'))-0.1
-        
+
         host = self.config.get(section_id, 'host')
         port = self.config.get(section_id, 'port')
         path = self.config.get(section_id, 'path')
@@ -202,7 +206,7 @@ class DomoticzOutput(PluginLoader.Plugin):
             })
         else: self.logger.debug('AC3 frequency out of range, or not defined: '+str(msg.f_ac(3))+' Hertz')
 
-        for idx, value in data_idx_array.items():
+        for idx, value in list(data_idx_array.items()):
             get_data = {
                 'svalue': value,
                 'type': 'command',
@@ -211,16 +215,31 @@ class DomoticzOutput(PluginLoader.Plugin):
                 'nvalue': '0'
                 }
 
-            get_data_encoded = urllib.urlencode(get_data)
-            self.logger.debug(url + '?' + get_data_encoded)
-            request_object = urllib2.Request(url + '?' + get_data_encoded)
-            try:
-                response = urllib2.urlopen(request_object)
-            except urllib2.HTTPError, e:
-                self.logger.error('HTTP error : '+str(e.code)+' Reason: '+str(e.reason))
-                return []
-            except urllib2.URLError, e:
-                self.logger.error('URL error : '+str(e.args)+' Reason: '+str(e.reason))
-                return []
+            if sys.version[:1] == '2':
+                get_data_encoded = urllib.urlencode(get_data)
+                self.logger.debug(url + '?' + get_data_encoded)
+                request_object = urllib2.Request(url + '?' + get_data_encoded)
+                try:
+                    response = urllib2.urlopen(request_object)
+                except urllib2.HTTPError as e:
+                    self.logger.error('HTTP error : '+str(e.code)+' Reason: '+str(e.reason))
+                    return []
+                except urllib2.URLError as e:
+                    self.logger.error('URL error : '+str(e.args)+' Reason: '+str(e.reason))
+                    return []
+                else:
+                    self.logger.debug(response.read())  # Show the response
             else:
-                self.logger.debug(response.read())  # Show the response
+                get_data_encoded = urllib.parse.urlencode(get_data)
+                self.logger.debug(url + '?' + get_data_encoded)
+                request_object = urllib.request.Request(url + '?' + get_data_encoded)
+                try:
+                    response = urllib.request.urlopen(request_object)
+                except urllib.error.HTTPError as e:
+                    self.logger.error('HTTP error : '+str(e.code)+' Reason: '+str(e.reason))
+                    return []
+                except urllib.error.URLError as e:
+                    self.logger.error('URL error : '+str(e.args)+' Reason: '+str(e.reason))
+                    return []
+                else:
+                    self.logger.debug(response.read())  # Show the response

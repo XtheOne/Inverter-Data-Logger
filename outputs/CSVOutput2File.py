@@ -1,4 +1,5 @@
 import PluginLoader
+import os
 from datetime import datetime
 
 
@@ -11,15 +12,23 @@ class CSVOutput(PluginLoader.Plugin):
         Args:
             msg (InverterMsg.InverterMsg): Message to process
         """
-        if not self.config.getboolean('csv', 'disable_header'):
-            print ("DateTime,ID,Temp,VPV1,VPV2,VPV3,IPV1,IPV2,IPV3,IAC1,IAC2,IAC3," \
+        if (self.config.getboolean('csv', 'daily_file')):
+            csvfilename = datetime.now().strftime("%Y-%m-%d") + "_" + self.config.get('csv', 'csv_file_name')
+        else:
+            csvfilename = self.config.get('csv', 'csv_file_name')
+
+        if (not os.path.exists(csvfilename)) & (not self.config.getboolean('csv', 'disable_header')):
+            file = open(csvfilename, 'w')
+            file.write ("DateTime,ID,Temp,VPV1,VPV2,VPV3,IPV1,IPV2,IPV3,IAC1,IAC2,IAC3," \
                   "VAC1,VAC2,VAC3,FAC1,PAC1,FAC2,PAC2,FAC3,PAC3," \
-                  "ETODAY,ETOTAL,HTOTAL")
+                  "ETODAY,ETOTAL,HTOTAL\n")
+        else:
+            file = open(csvfilename, 'a')
 
         timestamp = datetime.now().strftime('%Y-%m-%d %H:%M');
-        print (("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9}," +
+        file.write (("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9}," +
                "{10},{11},{12},{13},{14},{15},{16},{17},{18},{19}," +
-               "{20},{21},{22},{23}")\
+               "{20},{21},{22},{23}\n")\
             .format(timestamp, msg.id, msg.temperature,
                     msg.v_pv(1), msg.v_pv(2), msg.v_pv(3),
                     msg.i_pv(1), msg.i_pv(2), msg.i_pv(3),

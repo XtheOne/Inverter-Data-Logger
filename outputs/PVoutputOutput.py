@@ -1,8 +1,12 @@
 import PluginLoader
-import datetime
-import urllib
-import urllib2
-
+from datetime import datetime
+from pytz import timezone
+import sys
+if sys.version[:1] == '2':
+    import urllib
+    import urllib2
+else:
+    import urllib.request, urllib.parse, urllib.error
 
 class PVoutputOutput(PluginLoader.Plugin):
     """Sends the data from the inverter logger to PVoutput.org"""
@@ -14,7 +18,8 @@ class PVoutputOutput(PluginLoader.Plugin):
             msg (InverterMsg.InverterMsg): Message to process
 
         """
-        now = datetime.datetime.now()
+        timezoner = timezone('Europe/Amsterdam')
+        now = datetime.now(timezoner)
 
         if (now.minute % 5) == 0:  # Only run at every 5 minute interval
 
@@ -47,29 +52,46 @@ class PVoutputOutput(PluginLoader.Plugin):
                 'v1': msg.e_today * 1000,
                 'v2': msg.p_ac(1),
             }
-            # sometimes the inverter gives 514,7 as temperature, don't send temp then!
-            if (msg.temperature<300 and self.config.getboolean('general', 'use_temperature')):
-                get_data.update ({
-                    'v5': msg.temperature,
-                })
-            else: self.logger.error('temperature out of range: '+str(msg.temperature))
+            if self.config.getboolean('general', 'use_temperature'):
+                # sometimes the inverter gives 514,7 as temperature, don't send temp then!
+                if msg.temperature < 300:
+                    get_data.update ({
+                        'v5': msg.temperature,
+                    })
+                else: self.logger.error('temperature out of range: '+str(msg.temperature))
 
             get_data.update ({
                 'v6': msg.v_pv(1)
-            })    
+            })
 
-            get_data_encoded = urllib.urlencode(get_data)
-            self.logger.debug(url + '?' + get_data_encoded)
-            request_object = urllib2.Request(url + '?' + get_data_encoded)
-            try:
-                response = urllib2.urlopen(request_object)
-            except urllib2.HTTPError, e:
-                self.logger.error('HTTP error : '+str(e.code)+' Reason: '+str(e.reason))
-                return []
-            except urllib2.URLError, e:
-                self.logger.error('URL error : '+str(e.args)+' Reason: '+str(e.reason))
-                return []
+            if sys.version[:1] == '2':
+                get_data_encoded = urllib.urlencode(get_data)
+                self.logger.debug(url + '?' + get_data_encoded)
+                request_object = urllib2.Request(url + '?' + get_data_encoded)
+                try:
+                    response = urllib2.urlopen(request_object)
+                except urllib2.HTTPError as e:
+                    self.logger.error('HTTP error : '+str(e.code)+' Reason: '+str(e.reason))
+                    return []
+                except urllib2.URLError as e:
+                    self.logger.error('URL error : '+str(e.args)+' Reason: '+str(e.reason))
+                    return []
+                else:
+                    self.logger.debug(response.read())  # Show the response
             else:
-                self.logger.debug(response.read())  # Show the response
+                get_data_encoded = urllib.parse.urlencode(get_data)
+                self.logger.debug(url + '?' + get_data_encoded)
+                request_object = urllib.request.Request(url + '?' + get_data_encoded)
+                try:
+                    response = urllib.request.urlopen(request_object)
+                except urllib.error.HTTPError as e:
+                    self.logger.error('HTTP error : '+str(e.code)+' Reason: '+str(e.reason))
+                    return []
+                except urllib.error.URLError as e:
+                    self.logger.error('URL error : '+str(e.args)+' Reason: '+str(e.reason))
+                    return []
+                else:
+                    self.logger.debug(response.read())  # Show the response
 
-        self.logger.error('Not sending to PVoutput, not within 5 minutes interval.')
+        else:
+            self.logger.debug('Not sending to PVoutput, not within 5 minutes interval.')
