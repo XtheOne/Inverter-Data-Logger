@@ -15,6 +15,7 @@ else:
 import optparse
 import os
 import re
+import errno
 from PluginLoader import Plugin
 import InverterMsg  # Import the Msg handler
 import InverterLib  # Import the library
@@ -70,92 +71,84 @@ class InverterExport(object):
             __import__(plugin_name)
 
         # Connect to logger
-        if not self.config.has_option('logger', 'gateways'):
-            self.logger.error('no gateways defined in configuration file, exiting.')
+        if not self.config.has_option('server', 'listen_address'):
+            self.logger.error('no listen address defined in configuration file, exiting.')
             return []
 
-        if(self.config.get('logger', 'gateways') == 'auto'):
-            # get loggers
-            gateway_list = InverterLib.getLoggers().split(',')
-            if (len(gateway_list) < 2):
-                self.logger.error('No loggers found: {0}, exiting.'.format(gateway_list))
-                return []
-            self.logger.info('Loggers found  on the network: {0}.'.format(gateway_list))
-        else:
-            gateway_list = self.config.get('logger', 'gateways').split(',')
-            if (len(gateway_list) % 2):
-                self.logger.error('incorrect number of values in configuration file for gateways: {0}, exiting.'.format(gateway_list))
-                return []
+        if not self.config.has_option('server', 'listen_port'):
+            self.logger.error('no listen port defined in configuration file, exiting.')
+            return []
 
-        for i in range(0, len(gateway_list), 2):
-            ip = gateway_list[i]
-            sn = gateway_list[i+1]
+        port = int(self.config.get('server', 'listen_port'))
+        liip = self.config.get('server', 'listen_address')
 
-            self.logger.info('Connecting to logger with IP: {0} and SN {1}'.format(ip, sn))
+        self.logger.info('Start listening on IP: {0} and Port {1}'.format(liip, port))
+        self.logger.info('Use CTRL-Break to exit.')
 
-            port = self.config.get('logger', 'port')
-            timeout = self.config.getfloat('logger', 'timeout')
+        logger_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        logger_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        logger_socket.bind((liip, port))
+        logger_socket.listen(1)
 
-            next = False
-            for res in socket.getaddrinfo(ip, port, socket.AF_INET,
-                                           socket.SOCK_STREAM):
-                 family, socktype, proto, canonname, sockadress = res
-                 try:
-                     self.logger.info('connecting to {0} port {1}'.format(ip, port))
-                     logger_socket = socket.socket(family, socktype, proto)
-                     logger_socket.settimeout(timeout)
-                     logger_socket.connect(sockadress)
-                 except socket.error as msg:
-                     self.logger.error('Could not open socket')
-                     self.logger.error(msg)
-                     self.logger.error('Error connecting to logger with IP: {0} and SN {1}, trying next logger.'.format(ip, sn))
-                     next = True
-                     break
-            if (next):
-                continue
-
-            data = InverterLib.createV5RequestFrame(int(sn))
-            logger_socket.sendall(data)
-
-            #dump raw data to log
-            self.logger.debug('RAW sent Packet (len={0}): '.format(len(data))+':'.join(hex(ord(chr(x)))[2:].zfill(2) for x in bytearray(data))+'  '+re.sub('[^\x20-\x7f]', '', ''.join(chr(x) for x in bytearray(data))))
-
+        while (True):
+            # Wait for a connection
+            self.logger.debug('waiting for a connection.')
+            conn,addr = logger_socket.accept()
+    
+            self.logger.debug('connection from: {0}'.format(addr))
+    
             okflag = False
             while (not okflag):
-
                 try:
-                    data = logger_socket.recv(1024)
-                except socket.timeout as e:
-                    self.logger.error('Timeout connecting to logger with IP: {0} and SN {1}, trying next logger.'.format(ip, sn))
+                    data = conn.recv(1024)
+                    #when disconnected
+                    if(len(data) == 0):
+                        self.logger.debug('Socket disconnected')
+                        okflag = True
+                        continue
+
+                except socket.error as e:
+                    err = e.args[0]
+                    if err == errno.EAGAIN or err == errno.EWOULDBLOCK:
+                        sleep(1)
+                        self.logger.error('No data available. err = {0}'.format(err))
+                        okflag = True
+                        continue
+                    else:
+                        # a "real" error occurred
+                        self.logger.error('Socket error. err = {0}'.format(err))
+                        okflag = True
+                        continue
+    
+                if(len(data) < 13):
+                    self.logger.error("Too short frame received: {0} bytes".format(len(data)))
                     okflag = True
                     continue
-
+    
                 #dump raw data to log
                 self.logger.debug('RAW received Packet (len={0}): '.format(len(data))+':'.join(hex(ord(chr(x)))[2:].zfill(2) for x in bytearray(data))+'  '+re.sub('[^\x20-\x7f]', '', ''.join(chr(x) for x in bytearray(data))))
-
+    
                 msg = InverterMsg.InverterMsg(data)
-
+    
                 #log DATA length
                 self.logger.debug('DATA len={0}: '.format(msg.len))
-
+    
                 if (msg.msg)[:9] == 'DATA SEND':
                     self.logger.debug("Exit Status: {0}".format(msg.msg))
-                    logger_socket.close()
                     okflag = True
                     continue
-
+    
                 if (msg.msg)[:11] == 'NO INVERTER':
-                    self.logger.debug("Inverter(s) are in sleep mode: {0} received".format(msg.msg))
-                    logger_socket.close()
+                    self.logger.debug("Inverter is in sleep mode: {0} received".format(msg.msg))
                     okflag = True
                     continue
-
+    
                 self.logger.info("Inverter ID: {0}".format(msg.id))
                 if (msg.len > 140):
                     self.logger.info("Inverter main firmware version: {0}".format(msg.main_fwver))
                     self.logger.info("Inverter slave firmware version: {0}".format(msg.slave_fwver))
                 self.logger.info("RUN State: {0}".format(msg.run_state))
-
+    
                 for plugin in Plugin.plugins:
                     self.logger.debug('Run plugin' + plugin.__class__.__name__)
                     plugin.process_message(msg)

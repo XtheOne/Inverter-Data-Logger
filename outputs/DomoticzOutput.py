@@ -43,7 +43,7 @@ class DomoticzOutput(PluginLoader.Plugin):
 
         url = ("http://" + host + ":" + port + path)
         self.logger.debug('url: '+url)
-        self.logger.debug('Temperature   : '+str(msg.temperature)+' degrees celcius') # err:514,7
+        self.logger.debug('Temperature   : '+str(msg.temp)+' degrees celcius') # err:514,7
         self.logger.debug('PV1 voltage   : '+str(msg.v_pv(1))+' Volt')
         self.logger.debug('AC1 voltage   : '+str(msg.v_ac(1))+' Volt')
         self.logger.debug('AC total power: '+str(p_ac_t)+' Watt')
@@ -56,11 +56,11 @@ class DomoticzOutput(PluginLoader.Plugin):
             self.config.get(section_id, 'Electric_meter_idx'): str(p_ac_t)+';'+str(e_total*1000),
         }
         # sometimes the inverter gives 514,7 as temperature, don't send temp then!
-        if (mt<msg.temperature<300 and self.config.has_option(section_id, 'Temp_idx')):
+        if (mt<msg.temp<300 and self.config.has_option(section_id, 'Temp_idx')):
             data_idx_array.update ({
-                self.config.get(section_id, 'Temp_idx'): msg.temperature,
+                self.config.get(section_id, 'Temp_idx'): msg.temp,
             })
-        else: self.logger.debug('Temperature out of range, or not defined: '+str(msg.temperature)+' degrees celcius')
+        else: self.logger.debug('Temperature out of range, or not defined: '+str(msg.temp)+' degrees celcius')
         # Send  e_today and e_total in Wh and h_total in h
         if (self.config.has_option(section_id, 'E_today_idx')):
             data_idx_array.update ({

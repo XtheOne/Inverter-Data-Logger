@@ -37,7 +37,7 @@ class PVoutputOutput(PluginLoader.Plugin):
 
             url = "http://pvoutput.org/service/r2/addstatus.jsp"
 
-            self.logger.debug('temperature: '+str(msg.temperature)) # err:514,7
+            self.logger.debug('temperature: '+str(msg.temp)) # err:514,7
             self.logger.debug('AC1 voltage: '+str(msg.v_ac(1)))
             self.logger.debug('PV1 voltage: '+str(msg.v_pv(1)))
             self.logger.debug('e_today    : '+str(msg.e_today))
@@ -54,11 +54,11 @@ class PVoutputOutput(PluginLoader.Plugin):
             }
             if self.config.getboolean('general', 'use_temperature'):
                 # sometimes the inverter gives 514,7 as temperature, don't send temp then!
-                if msg.temperature < 300:
+                if msg.temp < 300:
                     get_data.update ({
-                        'v5': msg.temperature,
+                        'v5': msg.temp,
                     })
-                else: self.logger.error('temperature out of range: '+str(msg.temperature))
+                else: self.logger.error('temperature out of range: '+str(msg.temp))
 
             get_data.update ({
                 'v6': msg.v_pv(1)

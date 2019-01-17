@@ -9,12 +9,14 @@ This script is designed to be run as a cronjob (or scheduled tasks on Windows) e
 Every time this script is run the data from the inverter(s) will be send to the enabled plugin(s).
 And with a five minute interval the data will also be uploaded to PVoutput.org as a live status when enabled.
 
+As an alternative a server script can be run which listens for incomming connections from the logger.
+
 ## Origin
 This is based on the original work of Wouter van der Zwan and includes some improvements made by others.
 
 ## Supported inverters
 - Users reported that this script works for wifi kits with a s/n starting with 602xxxxxx to 606xxxxxx.
-- Also tested with a Wifi kit in a Hosola inverter in the 611xxxxx range.
+- Also tested with a Wifi kit in a Hosola inverter in the 611xxxxx/617xxxxx range.
 - Also works for newer 1601xxxxxx WiFi kit as used in the Omnik TL2 inverters.
 - Also works with iGEN Wi-Fi external loggers with s/n starting with 504xxxxxx
 
@@ -26,14 +28,37 @@ Owners of a Wifi kit starting with s/n 402xxxxxxx should checkout
 [Omnikol-PV-Logger by t3kpunk](https://github.com/t3kpunk/Omniksol-PV-Logger).
 
 ## Installation and Setup
-* Install Python
+* Install Python (tested with python-2.7.14 and python-3.6.4)
 * Git clone the source with `git clone https://github.com/XtheOne/Inverter-Data-Logger.git`
+* Install python libs: `pip install six` and if you use MQTT install `pip install paho-mqtt` for PVoutput add: `pip install pytz`
 * Copy the `config-org.cfg` to `config.cfg`
 * Change the settings in `config.cfg` (See '[Configuration](#configuration)')
 * Test your settings with `python LiveStats.py`, when successful you should see data from your inverter.
 * Run the script with `python InverterExport.py` or better set a scheduled task or cronjob. (See '[Setting cronjob](#setting-cronjob)')
+* Or run the server script with `python InverterServer.py`
 
 ## Configuration
+
+open config.cfg
+
+There a few settings that you have to change to get a minimal working script:
+
+set a fixed IP for one or more inverters like the example, or let the script do a auto-scan:
+```
+[logger]
+# ip,sn,ip,sn,ip,sn or auto
+# IP address of your inverter(s) data logger and S/N of the wifi kit(s)
+#gateways = 192.168.1.10,602123456, 192.168.1.11,602987654
+# Automatically detect logger(s) on the local network
+gateways = auto
+# Default for the Wifi module/logger/gateway
+port = 8899
+# time to wait for inverter logger response
+timeout = 3
+```
+Besure that you have the S/N ready from the inverterm in case that you user the manual input. You can find it in the webpage of your inverter or on the inverter case.
+
+### Setup Domoticz support
 To enable Domoticz support, enable the DomoticzOutput plugin in the config file.
 Then Create the following new hardware:
 * Name: Inverter Virtual
@@ -67,6 +92,10 @@ Now Create the following Virtual Sensors:
 
 Now go to Devices and fill the Idx of these virtual sensors into the config file.
 This is for a single phase inverter with 2 PV strings and basic values, more virtual sensors can be added for other identifiers.
+
+## Server config
+To use the Server script configure the listen IP and port and use these in the Wi-Fi-logger.
+Configure Remote Server B or C in the Wi-Fi- logger to point to the InverterServer IP and Port using TCP protocol.
 
 ### Setting cronjob
 #### For Linux/Unix
