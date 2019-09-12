@@ -21,7 +21,10 @@ class PVoutputOutput(PluginLoader.Plugin):
         timezoner = timezone('Europe/Amsterdam')
         now = datetime.now(timezoner)
 
-        if (now.minute % 5) == 0:  # Only run at every 5 minute interval
+        always_upload_option = 'always-upload-'+msg.id
+        always_upload = self.config.getboolean('pvout', always_upload_option, fallback=False)
+
+        if always_upload or (now.minute % 5) == 0:
 
             sys_id = 'sysid-'+msg.id
             if not self.config.has_option('pvout', sys_id):
