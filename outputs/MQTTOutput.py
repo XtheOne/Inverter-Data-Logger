@@ -16,7 +16,10 @@ class MWTTOutput(PluginLoader.Plugin):
                 client.connect( self.config.get('mqtt', 'host'),
                                 int(self.config.get('mqtt', 'port')), 60)
 
-                client.publish(mqtt_topic + "e_total", msg.e_total)
+                #e_total is truncated to 1 digit, add 2nd digit from e_today.
+                e_total = ((((msg.e_today*10)-(int(msg.e_today*10)))/10)+msg.e_total)
+
+                client.publish(mqtt_topic + "e_total", e_total)
                 client.publish(mqtt_topic + "e_today", msg.e_today)
                 client.publish(mqtt_topic + "h_total", msg.h_total)
                 client.publish(mqtt_topic + "ac_power", msg.p_ac(1))
